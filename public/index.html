@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D Party Manager</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="/socket.io/socket.io.js" defer></script>
+    <script type="module" src="js/main.js"></script>
+</head>
+
+<body>
+    <main id="app-container">
+
+        <section id="login-view" class="view hidden">
+            <header class="view-header">
+                <h1>D&D Party Manager</h1>
+            </header>
+
+            <div class="view-content">
+                <div class="form-card">
+                    <div class="input-group">
+                        <label for="username">Character Name</label>
+                        <input type="text" id="username" placeholder="Adventurer" required autocorrect="off"
+                            autocomplete="off" spellcheck="false">
+                    </div>
+
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="userRole" value="player" checked>
+                            <span class="radio-custom">Player</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="userRole" value="master">
+                            <span class="radio-custom">Master</span>
+                        </label>
+                    </div>
+
+                    <button id="btn-join" class="btn-primary">Join Party</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- <section id="room-view" class="view hidden"> -->
+        <section id="room-view" class="view">
+            <header class="view-header">
+                <h2>Initiative Order</h2>
+            </header>
+
+            <div class="view-content room-content">
+                <div id="player-list"></div>
+
+                <button class="btn-secondary" id="btn-leave">DESERT</button>
+            </div>
+        </section>
+
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+{
+  "name": "dnd-party-manager",
+  "version": "0.1.0",
+  "description": "A real-time Dungeons & Dragons party manager for initiative tracking and character sheets, powered by WebSockets.",
+  "main": "src/server.js",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "dnd",
+    "ttrpg",
+    "dungeon-master",
+    "initiative-tracker",
+    "socket.io",
+    "real-time",
+    "websocket"
+  ],
+  "author": "CarleScript",
+  "license": "MIT",
+  "packageManager": "pnpm@10.24.0",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3",
+    "uuid": "^13.0.0"
+  }
+}

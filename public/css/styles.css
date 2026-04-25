@@ -1,0 +1,258 @@
+:root {
+    --bg-main: #0f0f11;
+    --bg-card: #1a1a1e;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent-red: #991b1b;
+    --accent-hover: #b91c1c;
+    --border-color: #2dd4bf20;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    width: 100%;
+    min-height: 100dvh;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+#app-container {
+    width: 100%;
+    min-height: 100dvh;
+}
+
+.view {
+    width: 100%;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.view-header {
+    text-align: center;
+    padding: 2rem 1rem 1rem;
+}
+
+h1 {
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.view-content {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+}
+
+.form-card {
+    width: 100%;
+    max-width: 400px;
+    background-color: var(--bg-card);
+    padding: 2rem 1.5rem;
+    margin-bottom: 7rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-main);
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus {
+    border-color: var(--accent-red);
+}
+
+.radio-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.radio-option {
+    flex: 1;
+    cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+    display: none;
+}
+
+.radio-custom {
+    display: block;
+    text-align: center;
+    padding: 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.radio-option input[type="radio"]:checked+.radio-custom {
+    background-color: var(--accent-red);
+    color: white;
+    border-color: var(--accent-red);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 0.9rem;
+    margin-top: 0.5rem;
+    background-color: var(--accent-red);
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-primary:active {
+    transform: translateY(2px);
+}
+
+.btn-secondary {
+    width: 100%;
+    max-width: 500px;
+    padding: 0.9rem;
+    background-color: transparent;
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: bold;
+    border: 1px solid var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    border-color: var(--text-main);
+}
+
+.room-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 1rem;
+}
+
+#player-list {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+}
+
+.player-card {
+    background-color: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.player-info h3 {
+    font-size: 1.2rem;
+    margin: 0;
+    color: var(--text-main);
+    letter-spacing: 0.5px;
+}
+
+.player-info .stat {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.player-initiative {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    min-width: 65px;
+}
+
+.init-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--accent-red);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.init-value {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: var(--text-main);
+    line-height: 1;
+    margin-top: 0.2rem;
+}
+
+.player-card.offline {
+    opacity: 0.4;
+    filter: grayscale(80%);
+    border: 1px dashed var(--text-muted);
+}
