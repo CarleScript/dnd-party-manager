@@ -2,7 +2,13 @@ import { userJoin, onPartyUpdate, userLeave, onConnect, disconnectSocket, connec
 
 const state = {
     players: [],
-    config: null
+    config: null,
+    session: {
+        id: null,
+        username: null,
+        role: null,
+        view: null
+    }
 };
 
 const DOM = {
@@ -19,8 +25,8 @@ async function loadConfig() {
     try {
         const res = await fetch('/api/config');
         state.config = await res.json();
-    } catch (err) {
-        console.error('Failed to retrieve server configuration: ', err);
+    } catch (e) {
+        console.error('Failed to retrieve server configuration: ', e);
         alert('You rolled a Natural 1 while reaching the server. Please refresh and try again.');
     }
 }
@@ -35,6 +41,37 @@ const toggleViews = (view) => {
         }
     });
     if (view === 'login') DOM.usernameInput.focus();
+};
+
+const initSession = (userState) => {
+    localStorage.setItem(state.config.storageKey, JSON.stringify(userState));
+    state.session = { ...userState };
+};
+
+const clearSession = () => {
+    localStorage.removeItem(state.config.storageKey);
+    state.session = {
+        id: null,
+        username: null,
+        role: null,
+        view: null
+    }
+};
+
+const getSession = () => {
+    if (!state.session.id) {
+        const savedSession = localStorage.getItem(state.config?.storageKey);
+        if (savedSession) {
+            try {
+                state.session = JSON.parse(savedSession);
+            } catch (e) {
+                console.error('LocalStorage session parse error: ', e);
+                clearSession();
+                toggleViews('login');
+            }
+        }
+    }
+    return state.session;
 };
 
 const el = (tag, options = {}, children = []) => {
@@ -80,15 +117,15 @@ onPartyUpdate((partyMembers) => {
 const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) => {
     userJoin(name, role, savedUUID, (response) => {
         if (response.status === 'ok') {
-            const userState = { id: response.userId, username: name, view: 'room', role: role };
-            localStorage.setItem(state.config.storageKey, JSON.stringify(userState));
+            const userState = { id: response.userId, username: name, role: role, view: 'room' };
+            initSession(userState);
             toggleViews('room');
             if (!isAutoRejoin) DOM.usernameInput.value = '';
         } else {
             console.warn('Join request rejected by server: ', response.message);
 
             if (isAutoRejoin && response.message === 'session expired') {
-                localStorage.removeItem(state.config.storageKey);
+                clearSession();
                 toggleViews('login');
                 return;
             }
@@ -96,7 +133,7 @@ const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) => {
             switch (response.message) {
                 case 'session expired':
                     alert('You failed your Saving Throw against Disconnection. Please sign in again.');
-                    localStorage.removeItem(state.config.storageKey);
+                    clearSession();
                     toggleViews('login');
                     break;
                 case 'username already taken':
@@ -118,11 +155,8 @@ const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) => {
 };
 
 onConnect(() => {
-    const savedSession = localStorage.getItem(state.config?.storageKey);
-    if (savedSession) {
-        const { username, role, id } = JSON.parse(savedSession);
-        addPlayer(username, role, id, true);
-    }
+    const { username, role, id } = getSession();
+    if (id) addPlayer(username, role, id, true);
 });
 
 document.addEventListener('visibilitychange', () => {
@@ -163,11 +197,9 @@ const handleJoin = () => {
 };
 
 const handleLeave = () => {
-    const savedSession = localStorage.getItem(state.config.storageKey);
-    if (savedSession) {
-        const { id } = JSON.parse(savedSession);
-        userLeave(id);
-        localStorage.removeItem(state.config.storageKey);;
+    if (state.session.id) {
+        userLeave(state.session.id);
+        clearSession();
     }
     toggleViews('login');
 }
@@ -181,10 +213,8 @@ const init = async () => {
         if (event.key === 'Enter') handleJoin();
     });
 
-    const savedSession = localStorage.getItem(state.config.storageKey);
-    if (!savedSession) {
-        toggleViews('login');
-    }
+    const { id } = getSession();
+    if (!id) toggleViews('login');
 };
 
 init();
