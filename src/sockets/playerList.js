@@ -126,6 +126,15 @@ const setupPlayerListSocket = (io) => {
                 io.emit('party update', getPartyData());
             }
         });
+
+        socket.on('init update', (rawUsername, initiative ) => {
+            const username = rawUsername?.trim();
+            const userId = Object.keys(partyMembers).find(id => partyMembers[id].username === username);
+            if (userId) {
+                partyMembers[userId].initiative = initiative;
+            }
+            io.emit('party update', getPartyData());
+        });
     });
 }
 

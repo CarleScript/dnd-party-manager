@@ -1,6 +1,6 @@
 # ⚔️ D&D Party Manager 🐉
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/CarleScript/dnd-party-manager/releases)
+[![Version](https://img.shields.io/github/package-json/v/CarleScript/dnd-party-manager?label=version&color=blue)](https://github.com/CarleScript/dnd-party-manager/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js->=18.0.0-339933?logo=node.js)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-10.24.0-f69220?logo=pnpm)](https://pnpm.io/)
@@ -17,7 +17,7 @@ A modern, real-time web application built for Dungeon Masters and Players to sea
 * **Session Persistence:** Remembers user sessions via `localStorage` to survive accidental refreshes or disconnects.
 
 ### 🏗️ Roadmap (Coming Soon)
-- [ ] **Initiative Tracker:** Dynamic list sorting based on player input, with DM override capabilities.
+- [x] **Initiative Tracker:** Dynamic list sorting based on player input, with DM override capabilities.
 - [ ] **Health Tracking:** Real-time HP monitoring directly from the initiative board.
 - [ ] **PDF Character Sheets:** Integrated PDF reader so players can view their stats and initiative in the same tab.
 - [ ] **NPC Integration:** Allow the DM to inject non-playable characters into the initiative order.

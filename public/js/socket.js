@@ -27,3 +27,7 @@ export const disconnectSocket = () => {
 export const connectSocket = () => {
     socket.connect();
 };
+
+export const updateInitiative = (username, init) => {
+    socket.emit('init update', username, init);
+};

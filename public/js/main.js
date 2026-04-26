@@ -1,4 +1,4 @@
-import { userJoin, onPartyUpdate, userLeave, onConnect, disconnectSocket, connectSocket } from "./socket.js";
+import { userJoin, onPartyUpdate, userLeave, onConnect, disconnectSocket, connectSocket, updateInitiative } from "./socket.js";
 
 const state = {
     players: [],
@@ -74,40 +74,198 @@ const getSession = () => {
     return state.session;
 };
 
+const moveCursorToEnd = (el) => {
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+};
+
+const handleInitFocus = (target) => {
+    setTimeout(() => moveCursorToEnd(target), 0);
+};
+
+const checkInitInput = (e) => {
+    const { key, ctrlKey, altKey, metaKey, target } = e;
+
+    if (ctrlKey || altKey || metaKey || key.startsWith('F')) return;
+
+    if (key === 'Escape') {
+        target.textContent = target.dataset.oldValue;
+        target.blur();
+        return;
+    }
+
+    if (key === 'Enter') {
+        e.preventDefault();
+        target.blur();
+        return;
+    }
+
+    const isNumber = /^[0-9]$/.test(key);
+    const isControl = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Escape'].includes(key);
+
+    if (!isNumber && !isControl) return e.preventDefault();
+
+    if (isNumber) {
+        const currentText = target.textContent;
+        const hasSelection = window.getSelection().toString().length > 0;
+
+        if (currentText === '0' && !hasSelection) {
+            e.preventDefault();
+            target.textContent = key;
+            moveCursorToEnd(target);
+            return;
+        }
+
+        const maxLength = parseInt(target.dataset?.maxlength, 10) || 2;
+
+        if (currentText.length >= maxLength && !hasSelection) {
+            e.preventDefault();
+        }
+    }
+};
+
+const preventInitInput = (e) => {
+    const { target } = e;
+    const maxLength = parseInt(target.dataset?.maxlength, 10) || 2;
+    const dynamicRegex = new RegExp(`^[0-9]{1,${maxLength}}$`);
+    if (!dynamicRegex.test(target.textContent)) target.textContent = '0';
+    moveCursorToEnd(target);
+};
+
+const updateInit = (e) => {
+    const { target } = e;
+    const currentText = target.textContent.trim();
+
+    if (currentText === '') {
+        target.textContent = '0';
+    }
+
+    const initiative = parseInt(target.textContent, 10);
+
+    if (isNaN(initiative)) {
+        target.textContent = '0';
+        return;
+    }
+
+    const playerCard = target.closest('.player-card');
+    const playerName = playerCard.dataset.id;
+
+    updateInitiative(playerName, initiative);
+};
+
+const updateHP = (e) => {
+    // TODO
+};
+
 const el = (tag, options = {}, children = []) => {
     const element = document.createElement(tag);
     if (options.className) element.className = options.className;
     if (options.text) element.textContent = options.text;
+    if (options.editable) element.contentEditable = options.editable;
+
+    if (options.attrs) {
+        Object.entries(options.attrs).forEach(([key, val]) => element.setAttribute(key, val));
+    }
+
+    if (options.dataset) {
+        Object.entries(options.dataset).forEach(([key, val]) => element.dataset[key] = val);
+    }
+
     children.forEach(child => {
         if (child) element.appendChild(child);
     });
+
     return element;
 };
 
 const renderPlayerList = () => {
+    const activeEl = document.activeElement;
+    const isEditing = activeEl && activeEl.isContentEditable && DOM.playerList.contains(activeEl);
+
+    if (isEditing) {
+        console.warn('Socket updates paused: User is currently editing a field to prevent focus loss.');
+        return;
+    }
+
     DOM.playerList.innerHTML = '';
     const fragment = document.createDocumentFragment();
 
+    const { username, role } = state.session;
+
     state.players
         .filter(p => p.role !== 'master')
+        .sort((a, b) => b.initiative - a.initiative)
         .forEach(player => {
-            const playerCard = el('div', { className: `player-card ${!player.online ? 'offline' : ''}` }, [
+            const editable = (username === player.username || role === 'master');
+            const playerName = player.username;
+
+            const playerCard = el('div', {
+                className: `player-card ${!player.online ? 'offline' : ''}`,
+                dataset: { id: playerName }
+            }, [
                 el('div', { className: 'player-info' }, [
                     el('h3', { text: player.username }),
-                    el('p', { className: 'stat', text: 'HP: 6/9' })
+                    el('p', { className: 'stat', text: 'HP: 13/14' })
                 ]),
                 el('div', { className: 'player-initiative' }, [
                     el('span', { className: 'init-label', text: 'Init' }),
-                    el('span', { className: 'init-value', text: String(player.initiative) })
+                    el('span', {
+                        className: 'init-value',
+                        text: String(player.initiative),
+                        ...(editable && {
+                            editable: 'true',
+                            attrs: { inputmode: 'numeric' },
+                            dataset: { field: 'init', maxlength: 2 }
+                        })
+                    })
                 ])
             ]);
 
             fragment.appendChild(playerCard);
         });
 
-
     DOM.playerList.appendChild(fragment);
 };
+
+DOM.playerList.addEventListener('mousedown', (e) => {
+    const initContainer = e.target.closest('.player-initiative');
+    if (initContainer) {
+        const editableSpan = initContainer.querySelector('.init-value[contenteditable="true"]');
+        if (editableSpan && e.target !== editableSpan) {
+            e.preventDefault();
+            editableSpan.focus();
+        }
+    }
+});
+
+DOM.playerList.addEventListener('focusin', (e) => {
+    const field = e.target.dataset?.field;
+    if (field === 'init' || field === 'hp') {
+        e.target.dataset.oldValue = e.target.textContent;
+        handleInitFocus(e.target);
+    }
+});
+
+DOM.playerList.addEventListener('keydown', (e) => {
+    if (e.target.dataset?.field === 'init') checkInitInput(e);
+});
+
+DOM.playerList.addEventListener('input', (e) => {
+    if (e.target.dataset?.field === 'init') preventInitInput(e);
+});
+
+DOM.playerList.addEventListener('focusout', (e) => {
+    const field = e.target.dataset?.field;
+    if (field === 'init') {
+        updateInit(e);
+    } else if (field === 'hp') {
+        updateHP(e);
+    }
+});
 
 onPartyUpdate((partyMembers) => {
     state.players = partyMembers;
