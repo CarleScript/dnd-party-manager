@@ -1,4 +1,4 @@
-import { userJoin, onPartyUpdate, userLeave, onConnect, disconnectSocket, connectSocket, updateInitiative } from "./socket.js";
+import { userJoin, onPartyUpdate, userLeave, onConnect, disconnectSocket, connectSocket, updateStat } from "./socket.js";
 
 const state = {
     players: [],
@@ -83,11 +83,11 @@ const moveCursorToEnd = (el) => {
     selection.addRange(range);
 };
 
-const handleInitFocus = (target) => {
+const handleFocus = (target) => {
     setTimeout(() => moveCursorToEnd(target), 0);
 };
 
-const checkInitInput = (e) => {
+const checkInput = (e) => {
     const { key, ctrlKey, altKey, metaKey, target } = e;
 
     if (ctrlKey || altKey || metaKey || key.startsWith('F')) return;
@@ -128,7 +128,7 @@ const checkInitInput = (e) => {
     }
 };
 
-const preventInitInput = (e) => {
+const preventInput = (e) => {
     const { target } = e;
     const maxLength = parseInt(target.dataset?.maxlength, 10) || 2;
     const dynamicRegex = new RegExp(`^[0-9]{1,${maxLength}}$`);
@@ -136,7 +136,7 @@ const preventInitInput = (e) => {
     moveCursorToEnd(target);
 };
 
-const updateInit = (e) => {
+const updateInput = (e, inputName) => {
     const { target } = e;
     const currentText = target.textContent.trim();
 
@@ -144,9 +144,9 @@ const updateInit = (e) => {
         target.textContent = '0';
     }
 
-    const initiative = parseInt(target.textContent, 10);
+    const inputValue = parseInt(target.textContent, 10);
 
-    if (isNaN(initiative)) {
+    if (isNaN(inputValue)) {
         target.textContent = '0';
         return;
     }
@@ -154,11 +154,7 @@ const updateInit = (e) => {
     const playerCard = target.closest('.player-card');
     const playerName = playerCard.dataset.id;
 
-    updateInitiative(playerName, initiative);
-};
-
-const updateHP = (e) => {
-    // TODO
+    updateStat(playerName, inputName, inputValue)
 };
 
 const el = (tag, options = {}, children = []) => {
@@ -209,7 +205,17 @@ const renderPlayerList = () => {
             }, [
                 el('div', { className: 'player-info' }, [
                     el('h3', { text: player.username }),
-                    el('p', { className: 'stat', text: 'HP: 13/14' })
+                    el('p', { className: 'stat player-hp', text: 'HP: ' }, [
+                        el('span', {
+                            className: 'hp-value',
+                            text: String(player.hp),
+                            ...(editable && {
+                                editable: 'true',
+                                attrs: { inputmode: 'numeric' },
+                                dataset: { field: 'hp', maxlength: 3 }
+                            })
+                        })
+                    ])
                 ]),
                 el('div', { className: 'player-initiative' }, [
                     el('span', { className: 'init-label', text: 'Init' }),
@@ -232,9 +238,9 @@ const renderPlayerList = () => {
 };
 
 DOM.playerList.addEventListener('mousedown', (e) => {
-    const initContainer = e.target.closest('.player-initiative');
-    if (initContainer) {
-        const editableSpan = initContainer.querySelector('.init-value[contenteditable="true"]');
+    const container = e.target.closest('.player-initiative, .player-hp');
+    if (container) {
+        const editableSpan = container.querySelector('[contenteditable="true"]');
         if (editableSpan && e.target !== editableSpan) {
             e.preventDefault();
             editableSpan.focus();
@@ -242,29 +248,25 @@ DOM.playerList.addEventListener('mousedown', (e) => {
     }
 });
 
+const EDITABLE_FIELDS = ['init', 'hp'];
+
 DOM.playerList.addEventListener('focusin', (e) => {
-    const field = e.target.dataset?.field;
-    if (field === 'init' || field === 'hp') {
+    if (EDITABLE_FIELDS.includes(e.target.dataset?.field)) {
         e.target.dataset.oldValue = e.target.textContent;
-        handleInitFocus(e.target);
+        handleFocus(e.target);
     }
 });
 
 DOM.playerList.addEventListener('keydown', (e) => {
-    if (e.target.dataset?.field === 'init') checkInitInput(e);
+    if (EDITABLE_FIELDS.includes(e.target.dataset?.field)) checkInput(e);
 });
 
 DOM.playerList.addEventListener('input', (e) => {
-    if (e.target.dataset?.field === 'init') preventInitInput(e);
+    if (EDITABLE_FIELDS.includes(e.target.dataset?.field)) preventInput(e);
 });
 
 DOM.playerList.addEventListener('focusout', (e) => {
-    const field = e.target.dataset?.field;
-    if (field === 'init') {
-        updateInit(e);
-    } else if (field === 'hp') {
-        updateHP(e);
-    }
+    if (EDITABLE_FIELDS.includes(e.target.dataset?.field)) updateInput(e, e.target.dataset?.field);
 });
 
 onPartyUpdate((partyMembers) => {

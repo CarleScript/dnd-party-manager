@@ -28,6 +28,6 @@ export const connectSocket = () => {
     socket.connect();
 };
 
-export const updateInitiative = (username, init) => {
-    socket.emit('init update', username, init);
+export const updateStat = (username, statName, statValue) => {
+    socket.emit('stat update', username, statName, statValue);
 };

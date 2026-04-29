@@ -8,6 +8,7 @@ const getPartyData = () => {
         username: user.username,
         role: user.role,
         initiative: user.initiative,
+        hp: user.hp,
         online: user.online
     }));
 };
@@ -98,6 +99,7 @@ const setupPlayerListSocket = (io) => {
                 username: username,
                 role: role,
                 initiative: 0,
+                hp: 0,
                 online: true,
                 socketId: socket.id
             };
@@ -127,11 +129,15 @@ const setupPlayerListSocket = (io) => {
             }
         });
 
-        socket.on('init update', (rawUsername, initiative ) => {
+        socket.on('stat update', (rawUsername, statName, statValue) => {
             const username = rawUsername?.trim();
             const userId = Object.keys(partyMembers).find(id => partyMembers[id].username === username);
             if (userId) {
-                partyMembers[userId].initiative = initiative;
+                if (statName === 'init') {
+                    partyMembers[userId].initiative = statValue;
+                } else if (statName === 'hp') {
+                    partyMembers[userId].hp = statValue;
+                }
             }
             io.emit('party update', getPartyData());
         });
