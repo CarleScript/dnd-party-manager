@@ -335,8 +335,8 @@ onConnect(() => {
 });
 
 document.addEventListener('visibilitychange', () => {
-    window.focus();
     if (document.visibilityState === 'hidden') {
+        document.activeElement?.blur();
         disconnectSocket();
     } else {
         connectSocket();
