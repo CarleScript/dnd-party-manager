@@ -205,16 +205,31 @@ const renderPlayerList = () => {
             }, [
                 el('div', { className: 'player-info' }, [
                     el('h3', { text: player.username }),
-                    el('p', { className: 'stat player-hp', text: 'HP: ' }, [
-                        el('span', {
-                            className: 'hp-value',
-                            text: String(player.hp),
-                            ...(editable && {
-                                editable: 'true',
-                                attrs: { inputmode: 'numeric' },
-                                dataset: { field: 'hp', maxlength: 3 }
+                    el('p', { className: 'stat player-hp' }, [
+                        el('span', { className: 'hp-group' }, [
+                            el('span', { text: 'HP: ' }),
+                            el('span', {
+                                className: 'current-hp-value',
+                                text: String(player.currentHp),
+                                ...(editable && {
+                                    editable: 'true',
+                                    attrs: { inputmode: 'numeric' },
+                                    dataset: { field: 'currentHp', maxlength: 3 }
+                                })
                             })
-                        })
+                        ]),
+                        el('span', { className: 'hp-group' }, [
+                            el('span', { text: '/' }),
+                            el('span', {
+                                className: 'max-hp-value',
+                                text: String(player.maxHp),
+                                ...(editable && {
+                                    editable: 'true',
+                                    attrs: { inputmode: 'numeric' },
+                                    dataset: { field: 'maxHp', maxlength: 3 }
+                                })
+                            })
+                        ])
                     ])
                 ]),
                 el('div', { className: 'player-initiative' }, [
@@ -238,7 +253,7 @@ const renderPlayerList = () => {
 };
 
 DOM.playerList.addEventListener('mousedown', (e) => {
-    const container = e.target.closest('.player-initiative, .player-hp');
+    const container = e.target.closest('.player-initiative, .hp-group');
     if (container) {
         const editableSpan = container.querySelector('[contenteditable="true"]');
         if (editableSpan && e.target !== editableSpan) {
@@ -248,7 +263,7 @@ DOM.playerList.addEventListener('mousedown', (e) => {
     }
 });
 
-const EDITABLE_FIELDS = ['init', 'hp'];
+const EDITABLE_FIELDS = ['init', 'currentHp', 'maxHp'];
 
 DOM.playerList.addEventListener('focusin', (e) => {
     if (EDITABLE_FIELDS.includes(e.target.dataset?.field)) {
@@ -320,6 +335,7 @@ onConnect(() => {
 });
 
 document.addEventListener('visibilitychange', () => {
+    window.focus();
     if (document.visibilityState === 'hidden') {
         disconnectSocket();
     } else {
