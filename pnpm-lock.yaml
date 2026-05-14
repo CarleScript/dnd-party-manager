@@ -9,16 +9,16 @@ importers:
   .:
     dependencies:
       dotenv:
-        specifier: ^17.4.2
+        specifier: 17.4.2
         version: 17.4.2
       express:
-        specifier: ^5.2.1
+        specifier: 5.2.1
         version: 5.2.1
       socket.io:
-        specifier: ^4.8.3
+        specifier: 4.8.3
         version: 4.8.3
       uuid:
-        specifier: ^13.0.0
+        specifier: 13.0.0
         version: 13.0.0
 
 packages:

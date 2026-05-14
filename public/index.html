@@ -43,8 +43,7 @@
             </div>
         </section>
 
-        <!-- <section id="room-view" class="view hidden"> -->
-        <section id="room-view" class="view">
+        <section id="room-view" class="view hidden">
             <header class="view-header">
                 <h2>Initiative Order</h2>
             </header>
@@ -52,7 +51,39 @@
             <div class="view-content room-content">
                 <div id="player-list"></div>
 
-                <button class="btn-secondary" id="btn-leave">DESERT</button>
+                <div class="room-actions">
+                    <button class="btn-secondary hidden" id="btn-add-npc">ADD NPC</button>
+                    <button class="btn-secondary" id="btn-leave">DESERT</button>
+                </div>
+
+                <dialog id="modal-npc" class="npc-dialog">
+                    <div class="dialog-content">
+                        <button type="button" id="btn-close-modal" class="dialog-close" aria-label="Close dialog">
+                            <svg class="dialog-close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="none" aria-hidden="true">
+                                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </button>
+                        <h2 class="npc-dialog-title">NPC STATS</h2>
+
+                        <form id="form-npc" class="npc-dialog-form" method="dialog">
+                            <div class="input-group">
+                                <label for="npc-name">Name</label>
+                                <input autofocus type="text" name="name" id="npc-name" placeholder="Monster" required
+                                    autocorrect="off" autocomplete="off" spellcheck="false">
+                                <label for="npc-init">INIT</label>
+                                <input autofocus type="number" name="init" id="npc-init" required value="0" min="0" max="99">
+                                <label for="npc-current-hp">Current HP</label>
+                                <input autofocus type="number" name="currentHp" id="npc-current-hp" required value="0" min="0" max="999">
+                                <label for="npc-max-hp">Max HP</label>
+                                <input autofocus type="number" name="maxHp" id="npc-max-hp" required value="0" min="0" max="999">
+                            </div>
+
+                            <button type="submit" value="confirm" class="btn-primary">Confirm</button>
+                        </form>
+                    </div>
+                </dialog>
             </div>
         </section>
 

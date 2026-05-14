@@ -20,7 +20,7 @@ async function startServer() {
 
         const PORT = config.port;
         server.listen(PORT, () => {
-            console.log(`erver is running at http://localhost:${PORT}`);
+            console.log(`server is running at http://localhost:${PORT}`);
         });
 
     } catch (error) {

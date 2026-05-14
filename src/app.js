@@ -16,7 +16,9 @@ app.get('/', (req, res) => {
 app.get('/api/config', (req, res) => {
     res.json({
         storageKey: config.storageKey,
-        maxNameLength: config.maxNameLength
+        maxNameLength: config.maxNameLength,
+        maxInitDigits: config.maxInitDigits,
+        maxHpDigits: config.maxHpDigits
     });
 });
 

@@ -1,4 +1,4 @@
-import { userJoin, onPartyUpdate, userLeave, onConnect, disconnectSocket, connectSocket, updateStat } from "./socket.js";
+import { userJoin, onPartyUpdate, userLeave, onConnect, disconnectSocket, connectSocket, updateStat, addNpc, removeNpc } from "./socket.js";
 
 const state = {
     players: [],
@@ -17,8 +17,12 @@ const DOM = {
     usernameInput: document.getElementById('username'),
     roleInputs: document.getElementsByName('userRole'),
     joinBtn: document.getElementById('btn-join'),
+    playerList: document.getElementById('player-list'),
+    addNpcBtn: document.getElementById('btn-add-npc'),
     leaveBtn: document.getElementById('btn-leave'),
-    playerList: document.getElementById('player-list')
+    npcModal: document.getElementById('modal-npc'),
+    closeModalBtn: document.getElementById('btn-close-modal'),
+    npcForm: document.getElementById('form-npc')
 };
 
 async function loadConfig() {
@@ -33,13 +37,13 @@ async function loadConfig() {
 
 const toggleViews = (view) => {
     const views = [[DOM.loginView, 'login'], [DOM.roomView, 'room']];
-    views.forEach(([element, name]) => {
-        if (name === view) {
-            element.classList.remove('hidden');
-        } else {
-            element.classList.add('hidden');
-        }
-    });
+    views.forEach(([element, name]) => { element.classList.toggle('hidden', name !== view) });
+
+    if (view === 'room') {
+        const isMaster = state.session.role === 'master';
+        DOM.addNpcBtn.classList.toggle('hidden', !isMaster);
+    }
+
     if (view === 'login') DOM.usernameInput.focus();
 };
 
@@ -72,6 +76,37 @@ const getSession = () => {
         }
     }
     return state.session;
+};
+
+const handleClick = (e) => {
+    const deleteBtn = e.target.closest('.btn-delete-npc');
+    if (deleteBtn) {
+        const playerCard = deleteBtn.closest('.player-card');
+        if (playerCard) {
+            e.preventDefault();
+            e.target.blur();
+            const npcName = playerCard.dataset.id;
+            removeNpc(state.session.id, npcName, (response) => {
+                if (response.status === 'ok') {
+                    return;
+                }
+                console.warn('NPC remove rejected by server: ', response.message);
+                alert('Fight the monster without cheats, you cowardly piece of shit!');
+                location.reload();
+            });
+        }
+    }
+};
+
+const handleMousedown = (e) => {
+    const container = e.target.closest('.player-initiative, .hp-group');
+    if (container) {
+        const editableSpan = container.querySelector('[contenteditable="true"]');
+        if (editableSpan && e.target !== editableSpan) {
+            e.preventDefault();
+            editableSpan.focus();
+        }
+    }
 };
 
 const moveCursorToEnd = (el) => {
@@ -154,7 +189,14 @@ const updateInput = (e, inputName) => {
     const playerCard = target.closest('.player-card');
     const playerName = playerCard.dataset.id;
 
-    updateStat(playerName, inputName, inputValue)
+    updateStat(state.session.id, playerName, inputName, inputValue, (response) => {
+        if (response.status === 'ok') {
+            return;
+        }
+        console.warn('Stat modification rejected by server: ', response.message);
+        alert("Don't tempt my patience, you miserable cheat. Stick to the rules or fuck off.");
+        location.reload();
+    });
 };
 
 const el = (tag, options = {}, children = []) => {
@@ -180,7 +222,7 @@ const el = (tag, options = {}, children = []) => {
 
 const renderPlayerList = () => {
     const activeEl = document.activeElement;
-    const isEditing = activeEl && activeEl.isContentEditable && DOM.playerList.contains(activeEl);
+    const isEditing = activeEl && DOM.playerList.contains(activeEl);
 
     if (isEditing) {
         console.warn('Socket updates paused: User is currently editing a field to prevent focus loss.');
@@ -192,15 +234,20 @@ const renderPlayerList = () => {
 
     const { username, role } = state.session;
 
-    state.players
+    (state.players || [])
         .filter(p => p.role !== 'master')
         .sort((a, b) => b.initiative - a.initiative)
         .forEach(player => {
             const editable = (username === player.username || role === 'master');
             const playerName = player.username;
+            const showDeleteNpcBtn = role === 'master' && player.role === 'npc';
+            const cardClasses = ['player-card'];
+            if (!player.online) cardClasses.push('offline');
+            else if (player.role === 'npc') cardClasses.push('npc');
+            if (username === player.username) cardClasses.push('self');
 
             const playerCard = el('div', {
-                className: `player-card ${!player.online ? 'offline' : ''}`,
+                className: cardClasses.join(' '),
                 dataset: { id: playerName }
             }, [
                 el('div', { className: 'player-info' }, [
@@ -210,7 +257,7 @@ const renderPlayerList = () => {
                             el('span', { text: 'HP: ' }),
                             el('span', {
                                 className: 'current-hp-value',
-                                text: String(player.currentHp),
+                                text: (role !== 'master' && player.role === 'npc') ? '?' : String(player.currentHp),
                                 ...(editable && {
                                     editable: 'true',
                                     attrs: { inputmode: 'numeric' },
@@ -222,7 +269,7 @@ const renderPlayerList = () => {
                             el('span', { text: '/' }),
                             el('span', {
                                 className: 'max-hp-value',
-                                text: String(player.maxHp),
+                                text: (role !== 'master' && player.role === 'npc') ? '?' : String(player.maxHp),
                                 ...(editable && {
                                     editable: 'true',
                                     attrs: { inputmode: 'numeric' },
@@ -232,6 +279,10 @@ const renderPlayerList = () => {
                         ])
                     ])
                 ]),
+                showDeleteNpcBtn ? el('button', {
+                    className: 'btn-secondary btn-delete-npc',
+                    text: 'SLAY'
+                }) : null,
                 el('div', { className: 'player-initiative' }, [
                     el('span', { className: 'init-label', text: 'Init' }),
                     el('span', {
@@ -252,16 +303,8 @@ const renderPlayerList = () => {
     DOM.playerList.appendChild(fragment);
 };
 
-DOM.playerList.addEventListener('mousedown', (e) => {
-    const container = e.target.closest('.player-initiative, .hp-group');
-    if (container) {
-        const editableSpan = container.querySelector('[contenteditable="true"]');
-        if (editableSpan && e.target !== editableSpan) {
-            e.preventDefault();
-            editableSpan.focus();
-        }
-    }
-});
+DOM.playerList.addEventListener('click', handleClick);
+DOM.playerList.addEventListener('mousedown', handleMousedown);
 
 const EDITABLE_FIELDS = ['init', 'currentHp', 'maxHp'];
 
@@ -345,7 +388,7 @@ document.addEventListener('visibilitychange', () => {
 
 const handleJoin = () => {
     if (!state.config) {
-        console.warn("System initialization in progress. Please wait.");
+        console.warn('System initialization in progress. Please wait.');
         alert(`The adventure isn't ready yet. Please try again in a moment.`);
         return;
     }
@@ -364,7 +407,7 @@ const handleJoin = () => {
 
     const role = Array.from(DOM.roleInputs).find(input => input.checked)?.value;
     if (!role || !['player', 'master'].includes(role)) {
-        alert('DO NOT MODIFY MY HTML, YOU FILTHY BITCH!');
+        alert('DO NOT MODIFY MY HTML, YOU FILTHY SCUM!');
         location.reload();
         return;
     }
@@ -380,11 +423,81 @@ const handleLeave = () => {
     toggleViews('login');
 }
 
+const openNpcModal = () => {
+    DOM.npcForm.reset();
+    DOM.npcModal.returnValue = '';
+    DOM.npcModal.showModal();
+};
+
+const closeNpcModal = () => {
+    if (DOM.npcModal.returnValue !== 'confirm') return;
+
+    if (!state.config) {
+        console.warn('System initialization in progress. Please wait.');
+        alert(`The adventure isn't ready yet. Please try again in a moment.`);
+        return;
+    }
+
+    const formData = new FormData(DOM.npcForm);
+    let { name, init, currentHp, maxHp } = Object.fromEntries(formData);
+
+    name = name.trim();
+    init = parseInt(init, 10);
+    currentHp = parseInt(currentHp, 10);
+    maxHp = parseInt(maxHp, 10);
+
+    if (!name) {
+        alert(`What kind of Master can't think of a motherfucking name?!`);
+        return;
+    }
+    if (name.length > state.config.maxNameLength) {
+        alert('Nobody is impressed by your novel-length title. Keep it short!');
+        return;
+    }
+
+    const isInitNotOk = (!isNaN(init) && String(init).length > state.config.maxInitDigits);
+    const isCurrentHpNotOk = (!isNaN(currentHp) && String(currentHp).length > state.config.maxHpDigits);
+    const isMaxHpNotOk = (!isNaN(maxHp) && String(maxHp).length > state.config.maxHpDigits);
+
+    if (isInitNotOk || isCurrentHpNotOk || isMaxHpNotOk) {
+        const stat = isInitNotOk ? 'initiative' : isCurrentHpNotOk ? 'current hp' : 'max hp';
+        alert(`How the fuck did you manage to send a wrong ${stat} value?`);
+        return;
+    }
+
+    addNpc(state.session.id, name, init, currentHp, maxHp, (response) => {
+        if (response.status === 'ok') {
+            return;
+        }
+        console.warn('NPC add rejected by server: ', response.message);
+        switch (response.message) {
+            case 'forbidden':
+                alert(`You're not the Master. Stay back, you filthy rogue!`);
+                break;
+            case 'name already taken':
+                alert('This name has already taken. Add a number at the end or something...');
+                break;
+            default:
+                alert('The NPC failed to materialize. Try again, loser.');
+                location.reload();
+                break;
+        }
+    });
+}
+
 const init = async () => {
     await loadConfig();
 
     DOM.joinBtn.addEventListener('click', handleJoin);
     DOM.leaveBtn.addEventListener('click', handleLeave);
+    DOM.addNpcBtn.addEventListener('click', openNpcModal);
+    DOM.closeModalBtn.addEventListener('click', () => DOM.npcModal.close(''));
+
+    DOM.npcModal.addEventListener('click', (e) => {
+        if (e.target === DOM.npcModal) DOM.npcModal.close('');
+    });
+    DOM.npcModal.addEventListener('close', closeNpcModal);
+
     DOM.usernameInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') handleJoin();
     });

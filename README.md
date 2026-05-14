@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/github/package-json/v/CarleScript/dnd-party-manager?label=version&color=blue)](https://github.com/CarleScript/dnd-party-manager/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js->=18.0.0-339933?logo=node.js)](https://nodejs.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-10.24.0-f69220?logo=pnpm)](https://pnpm.io/)
+[![pnpm](https://img.shields.io/badge/pnpm-11.0.5-f69220?logo=pnpm)](https://pnpm.io/)
 [![Socket.io](https://img.shields.io/badge/Socket.io-4.8.3-010101?logo=socket.io)](https://socket.io/)
 
 A modern, real-time web application built for Dungeon Masters and Players to seamlessly manage Dungeons & Dragons sessions. It provides instant synchronization for initiative orders, player status, and (coming soon) integrated character sheets.
@@ -15,15 +15,15 @@ A modern, real-time web application built for Dungeon Masters and Players to sea
 * **Smart Reconnection:** Handles mobile browser throttling and screen locks gracefully with native Page Visibility API integration.
 * **Role Management:** Differentiates between 'Master' (DM) and 'Player' roles.
 * **Session Persistence:** Remembers user sessions via `localStorage` to survive accidental refreshes or disconnects.
+* **Stats Tracking:** Real-time Initiative and HP monitoring directly from the initiative board, with DM override capabilities.
 
 ### 🏗️ Roadmap (Coming Soon)
-- [x] **Initiative Tracker:** Dynamic list sorting based on player input, with DM override capabilities.
-- [x] **Health Tracking:** Real-time HP monitoring directly from the initiative board, with DM override capabilities.
-- [ ] **NPC Integration:** Allow the DM to inject non-playable characters into the initiative order.
+- [x] **NPC Integration:** Allow the DM to inject non-playable characters into the initiative order.
 - [ ] **PDF Character Sheets:** Integrated PDF reader so players can view their stats and initiative in the same tab.
 - [ ] **Toast Notifications:** Clean, modern UI alerts to replace native browser popups.
 - [ ] **Server-Side Persistence:** Database integration (SQLite3) to ensure party state and initiative data survive server restarts.
 - [ ] **Thematic UI/UX Polish:** Implementing a mobile-first, D&D-inspired visual design with responsive layouts and immersive dark-mode aesthetics.
+- [ ] **Dice Roller:** Add a built-in dice rolling tool for quick and easy dice throws.
 
 ## 💻 Tech Stack
 
