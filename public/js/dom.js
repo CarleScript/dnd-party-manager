@@ -1,0 +1,16 @@
+export const DOM = {
+    loginView: document.getElementById('login-view'),
+    roomView: document.getElementById('room-view'),
+    usernameInput: document.getElementById('username'),
+    roleInputs: document.getElementsByName('userRole'),
+    joinBtn: document.getElementById('btn-join'),
+    playerList: document.getElementById('player-list'),
+    addNpcBtn: document.getElementById('btn-add-npc'),
+    leaveBtn: document.getElementById('btn-leave'),
+    npcModal: document.getElementById('modal-npc'),
+    closeModalBtn: document.getElementById('btn-close-modal'),
+    npcForm: document.getElementById('form-npc'),
+    npcInitInput: document.getElementById('npc-init'),
+    npcCurrentHpInput: document.getElementById('npc-current-hp'),
+    npcMaxHpInput: document.getElementById('npc-max-hp')
+};
