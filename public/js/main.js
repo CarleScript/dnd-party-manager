@@ -85,6 +85,14 @@ const getSession = () => {
     return state.session;
 };
 
+const handleNpcNumberFocus = (e) => {
+    if (e.target.value === '0') e.target.value = '';
+};
+
+const handleNpcNumberBlur = (e) => {
+    if (e.target.value === '') e.target.value = '0';
+};
+
 const handleClick = (e) => {
     const deleteBtn = e.target.closest('.btn-delete-npc');
     if (deleteBtn) {
@@ -510,6 +518,11 @@ const init = async () => {
         if (e.target === DOM.npcModal) DOM.npcModal.close('');
     });
     DOM.npcModal.addEventListener('close', closeNpcModal);
+
+    [DOM.npcInitInput, DOM.npcCurrentHpInput, DOM.npcMaxHpInput].forEach(input => {
+        input.addEventListener('focus', handleNpcNumberFocus);
+        input.addEventListener('blur', handleNpcNumberBlur);
+    });
 
     DOM.usernameInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') handleJoin();
