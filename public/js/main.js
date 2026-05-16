@@ -22,7 +22,10 @@ const DOM = {
     leaveBtn: document.getElementById('btn-leave'),
     npcModal: document.getElementById('modal-npc'),
     closeModalBtn: document.getElementById('btn-close-modal'),
-    npcForm: document.getElementById('form-npc')
+    npcForm: document.getElementById('form-npc'),
+    npcInitInput: document.getElementById('npc-init'),
+    npcCurrentHpInput: document.getElementById('npc-current-hp'),
+    npcMaxHpInput: document.getElementById('npc-max-hp')
 };
 
 async function loadConfig() {
@@ -32,6 +35,10 @@ async function loadConfig() {
     } catch (e) {
         console.error('Failed to retrieve server configuration: ', e);
         alert('You rolled a Natural 1 while reaching the server. Please refresh and try again.');
+    } finally {
+        DOM.npcInitInput.max = Math.pow(10, state.config.maxInitDigits) - 1;
+        DOM.npcCurrentHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
+        DOM.npcMaxHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
     }
 }
 
@@ -221,6 +228,12 @@ const el = (tag, options = {}, children = []) => {
 };
 
 const renderPlayerList = () => {
+    if (!state.config) {
+        console.warn('System initialization in progress. Please wait.');
+        alert(`The adventure isn't ready yet. Please try again in a moment.`);
+        return;
+    }
+
     const activeEl = document.activeElement;
     const isEditing = activeEl && DOM.playerList.contains(activeEl);
 
@@ -261,7 +274,7 @@ const renderPlayerList = () => {
                                 ...(editable && {
                                     editable: 'true',
                                     attrs: { inputmode: 'numeric' },
-                                    dataset: { field: 'currentHp', maxlength: 3 }
+                                    dataset: { field: 'currentHp', maxlength: state.config.maxHpDigits }
                                 })
                             })
                         ]),
@@ -273,7 +286,7 @@ const renderPlayerList = () => {
                                 ...(editable && {
                                     editable: 'true',
                                     attrs: { inputmode: 'numeric' },
-                                    dataset: { field: 'maxHp', maxlength: 3 }
+                                    dataset: { field: 'maxHp', maxlength: state.config.maxHpDigits }
                                 })
                             })
                         ])
@@ -291,7 +304,7 @@ const renderPlayerList = () => {
                         ...(editable && {
                             editable: 'true',
                             attrs: { inputmode: 'numeric' },
-                            dataset: { field: 'init', maxlength: 2 }
+                            dataset: { field: 'init', maxlength: state.config.maxInitDigits }
                         })
                     })
                 ])
