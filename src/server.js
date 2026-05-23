@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import app from './app.js';
 // import { initDB } from './config/db.js';
+import { partyManager } from './services/PartyManager.js';
 import setupPlayerListSocket from './sockets/playerList.js';
 
 async function startServer() {
@@ -16,7 +17,7 @@ async function startServer() {
         });
 
         // setupSockets(io, db);
-        setupPlayerListSocket(io);
+        setupPlayerListSocket(io, partyManager);
 
         const PORT = config.port;
         server.listen(PORT, () => {
