@@ -1,9 +1,9 @@
 import { config } from './../config/env.js';
 import { sendError, sendSuccess } from '../utils/socketResponses.js';
 
-const broadcastPartyUpdate = (io, partyManager) => {
+const broadcastPartyUpdate = (io, partyManager, userSkip = null) => {
     Object.values(partyManager.members).forEach(user => {
-        if (!user.online || !user.socketId) return;
+        if (!user.online || !user.socketId || user.id === userSkip) return;
         const viewData = partyManager.getPartyData(user.id);
         io.to(user.socketId).emit('party update', viewData);
     });
@@ -39,15 +39,15 @@ const setupPlayerListSocket = (io, partyManager) => {
                 const result = partyManager.reconnectMember(savedUUID, { socketId: socket.id });
                 if (result.error) return sendError(callback, result.error);
 
-                broadcastPartyUpdate(io, partyManager);
-                return sendSuccess(callback, { userId: savedUUID });
+                broadcastPartyUpdate(io, partyManager, savedUUID);
+                return sendSuccess(callback, { partyData: partyManager.getPartyData(savedUUID) });
             }
 
             const result = partyManager.addMember({ rawUsername, role, socketId: socket.id });
             if (result.error) return sendError(callback, result.error);
 
-            broadcastPartyUpdate(io, partyManager);
-            return sendSuccess(callback, { userId: result.userId });
+            broadcastPartyUpdate(io, partyManager, result.userId);
+            return sendSuccess(callback, { userId: result.userId, partyData: partyManager.getPartyData(result.userId) });
         });
 
         socket.on('remove npc', (savedUUID, rawName, callback) => {

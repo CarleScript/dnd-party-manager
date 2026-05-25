@@ -1,15 +1,19 @@
 import { state, initSession, clearSession } from './state.js';
 import { DOM } from './dom.js';
-import { toggleViews } from './ui.js';
+import { toggleViews, renderPlayerList } from './ui.js';
 import { userJoin, userLeave, addNpc, removeNpc, updateStat } from "./socket.js";
 
 export const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) => {
     userJoin(name, role, savedUUID, (response) => {
         if (response.status === 'ok') {
-            const userState = { id: response.userId, username: name, role: role, view: 'room' };
-            initSession(userState);
+            if (!savedUUID) {
+                const userState = { id: response.userId, username: name, role: role, view: 'room' };
+                initSession(userState);
+            }
             toggleViews('room');
             if (!isAutoRejoin) DOM.usernameInput.value = '';
+            state.players = response.partyData;
+            renderPlayerList();
         } else {
             console.warn('Join request rejected by server: ', response.message);
 
