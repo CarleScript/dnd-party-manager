@@ -161,7 +161,8 @@ input[type="number"] {
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-primary:focus {
     background-color: var(--accent-hover);
 }
 
@@ -183,7 +184,8 @@ input[type="number"] {
     transition: all 0.2s ease;
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover,
+.btn-secondary:focus {
     background-color: rgba(255, 255, 255, 0.05);
     color: var(--text-main);
     border-color: var(--text-main);
@@ -220,7 +222,6 @@ input[type="number"] {
     border-radius: 10px;
     padding: 1rem 1.2rem;
     display: flex;
-    /* justify-content: space-between; */
     align-items: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     transition: opacity 0.3s ease, filter 0.3s ease;
@@ -232,6 +233,7 @@ input[type="number"] {
     margin: 0 0.75rem;
     padding: 0.55rem 0.9rem;
     text-align: center;
+    order: 2;
 }
 
 .player-info {
@@ -239,6 +241,7 @@ input[type="number"] {
     flex-direction: column;
     gap: 0.2rem;
     margin-right: auto;
+    order: 1;
 }
 
 .player-info h3 {
@@ -263,6 +266,7 @@ input[type="number"] {
     border-radius: 8px;
     padding: 0.4rem 0.8rem;
     min-width: 65px;
+    order: 3;
 }
 
 .init-label {

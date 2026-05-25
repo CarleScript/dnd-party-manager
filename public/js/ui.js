@@ -99,10 +99,6 @@ export const renderPlayerList = () => {
                         ])
                     ])
                 ]),
-                showDeleteNpcBtn ? el('button', {
-                    className: 'btn-secondary btn-delete-npc',
-                    text: 'SLAY'
-                }) : null,
                 el('div', { className: 'player-initiative' }, [
                     el('span', { className: 'init-label', text: 'Init' }),
                     el('span', {
@@ -114,7 +110,11 @@ export const renderPlayerList = () => {
                             dataset: { field: 'init', maxlength: state.config.maxInitDigits }
                         })
                     })
-                ])
+                ]),
+                showDeleteNpcBtn ? el('button', {
+                    className: 'btn-secondary btn-delete-npc',
+                    text: 'SLAY'
+                }) : null
             ]);
 
             fragment.appendChild(playerCard);
