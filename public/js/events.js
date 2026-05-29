@@ -1,7 +1,17 @@
-import { state, initSession, clearSession } from './state.js';
 import { DOM } from './dom.js';
+import { state, initSession, clearSession, getSession } from './state.js';
 import { toggleViews, renderPlayerList } from './ui.js';
 import { userJoin, userLeave, addNpc, removeNpc, updateStat } from "./socket.js";
+
+export const toggleSheet = () => {
+    const { id, username, role, view } = getSession();
+    const altView = id ? 'room' : 'login'
+    const newView = !view || view === altView ? 'sheet' : altView;
+
+    toggleViews(newView);
+    initSession({ id, username, role, view: newView });
+    state.session.view = newView;
+};
 
 export const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) => {
     userJoin(name, role, savedUUID, (response) => {
@@ -10,7 +20,7 @@ export const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) =>
                 const userState = { id: response.userId, username: name, role: role, view: 'room' };
                 initSession(userState);
             }
-            toggleViews('room');
+            toggleViews(state.session.view || 'room');
             if (!isAutoRejoin) DOM.usernameInput.value = '';
             state.players = response.partyData;
             renderPlayerList();

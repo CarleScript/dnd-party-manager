@@ -14,6 +14,8 @@
 <body>
     <main id="app-container">
 
+        <button id="btn-toggle-sheet">Sheet!</button>
+
         <section id="login-view" class="view hidden">
             <header class="view-header">
                 <h1>D&D Party Manager</h1>
@@ -85,6 +87,16 @@
                         </form>
                     </div>
                 </dialog>
+            </div>
+        </section>
+
+        <section id="sheet-view" class="view hidden">
+            <header class="view-header">
+                <h2>Character Sheet</h2>
+            </header>
+
+            <div class="view-content">
+                <input type="file" name="sheet" id="sheet" accept="application/pdf">
             </div>
         </section>
 

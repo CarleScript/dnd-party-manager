@@ -1,8 +1,8 @@
-import { state } from './state.js';
 import { DOM } from './dom.js';
+import { state } from './state.js';
 
 export const toggleViews = (view) => {
-    const views = [[DOM.loginView, 'login'], [DOM.roomView, 'room']];
+    const views = [[DOM.loginView, 'login'], [DOM.roomView, 'room'], [DOM.sheetView, 'sheet']];
     views.forEach(([element, name]) => { element.classList.toggle('hidden', name !== view) });
 
     if (view === 'room') {

@@ -402,3 +402,9 @@ input[type="number"] {
         opacity: 0;
     }
 }
+
+#btn-toggle-sheet {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+}

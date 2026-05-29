@@ -1,6 +1,8 @@
 export const DOM = {
+    toggleSheetBtn: document.getElementById('btn-toggle-sheet'),
     loginView: document.getElementById('login-view'),
     roomView: document.getElementById('room-view'),
+    sheetView: document.getElementById('sheet-view'),
     usernameInput: document.getElementById('username'),
     roleInputs: document.getElementsByName('userRole'),
     joinBtn: document.getElementById('btn-join'),

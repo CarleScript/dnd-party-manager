@@ -1,8 +1,8 @@
-import { state, getSession } from './state.js';
 import { DOM } from './dom.js';
+import { state, getSession } from './state.js';
 import { toggleViews, renderPlayerList } from './ui.js';
 import { connectSocket, disconnectSocket, onConnect, onPartyUpdate } from "./socket.js";
-import { addPlayer, handleJoin, handleClick, handleMousedown, handleFocus, checkInput, preventInput, updateInput, openNpcModal, handleLeave, closeNpcModal, handleNpcNumberFocus, handleNpcNumberBlur } from './events.js';
+import { toggleSheet, addPlayer, handleJoin, handleClick, handleMousedown, handleFocus, checkInput, preventInput, updateInput, openNpcModal, handleLeave, closeNpcModal, handleNpcNumberFocus, handleNpcNumberBlur } from './events.js';
 
 async function loadConfig() {
     try {
@@ -24,11 +24,11 @@ onPartyUpdate((partyMembers) => {
 });
 
 onConnect(() => {
-    const { username, role, id } = getSession();
+    const { username, role, id, view } = getSession();
     if (id) {
         addPlayer(username, role, id, true);
     } else {
-        toggleViews('login');
+        toggleViews(view || 'login');
     }
 });
 
@@ -45,6 +45,8 @@ const init = async () => {
             connectSocket();
         }
     });
+
+    DOM.toggleSheetBtn.addEventListener('click', toggleSheet);
 
     DOM.usernameInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') handleJoin();
@@ -89,8 +91,8 @@ const init = async () => {
         input.addEventListener('blur', handleNpcNumberBlur);
     });
 
-    const { id } = getSession();
-    if (!id) toggleViews('login');
+    const { id, view } = getSession();
+    if (!id) toggleViews(view || 'login');
 };
 
 init();
