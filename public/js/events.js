@@ -1,7 +1,8 @@
 import { DOM } from './dom.js';
 import { state, initSession, clearSession, getSession } from './state.js';
-import { toggleViews, renderPlayerList } from './ui.js';
-import { userJoin, userLeave, addNpc, removeNpc, updateStat } from "./socket.js";
+import { toggleViews, renderPlayerList, renderSheet } from './ui.js';
+import { userJoin, userLeave, addNpc, removeNpc, updateStat } from './socket.js';
+import { saveSheet, loadSheet, removeSheet } from './api.js';
 
 export const toggleSheet = () => {
     const { id, username, role, view } = getSession();
@@ -289,3 +290,20 @@ export const handleNpcNumberFocus = (e) => {
 export const handleNpcNumberBlur = (e) => {
     if (e.target.value === '') e.target.value = '0';
 };
+
+export const handleSheetUpload = async (e) => {
+    const sheet = e.target?.files?.[0];
+    if (!sheet) return;
+    await saveSheet('sheet', sheet);
+    renderSheet(sheet)
+};
+
+export const tryLoadSheet = async () => {
+    const sheet = await loadSheet('sheet');
+    if (sheet) renderSheet(sheet);
+};
+
+export const handleSheetRemove = async (e) => {
+    await removeSheet('sheet');
+    renderSheet(null);
+}

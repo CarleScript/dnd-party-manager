@@ -1,8 +1,26 @@
 import { DOM } from './dom.js';
 import { state, getSession } from './state.js';
 import { toggleViews, renderPlayerList } from './ui.js';
-import { connectSocket, disconnectSocket, onConnect, onPartyUpdate } from "./socket.js";
-import { toggleSheet, addPlayer, handleJoin, handleClick, handleMousedown, handleFocus, checkInput, preventInput, updateInput, openNpcModal, handleLeave, closeNpcModal, handleNpcNumberFocus, handleNpcNumberBlur } from './events.js';
+import { connectSocket, disconnectSocket, onConnect, onPartyUpdate } from './socket.js';
+import {
+    toggleSheet,
+    addPlayer,
+    handleJoin,
+    handleClick,
+    handleMousedown,
+    handleFocus,
+    checkInput,
+    preventInput,
+    updateInput,
+    openNpcModal,
+    handleLeave,
+    closeNpcModal,
+    handleNpcNumberFocus,
+    handleNpcNumberBlur,
+    handleSheetUpload,
+    tryLoadSheet,
+    handleSheetRemove
+} from './events.js';
 
 async function loadConfig() {
     try {
@@ -36,6 +54,7 @@ const EDITABLE_FIELDS = ['init', 'currentHp', 'maxHp'];
 
 const init = async () => {
     await loadConfig();
+    await tryLoadSheet();
 
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
@@ -90,6 +109,9 @@ const init = async () => {
         input.addEventListener('focus', handleNpcNumberFocus);
         input.addEventListener('blur', handleNpcNumberBlur);
     });
+
+    DOM.sheetUploadInput.addEventListener('change', handleSheetUpload);
+    DOM.sheetRemoveBtn.addEventListener('click', handleSheetRemove);
 
     const { id, view } = getSession();
     if (!id) toggleViews(view || 'login');

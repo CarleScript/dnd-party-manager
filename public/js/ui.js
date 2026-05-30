@@ -122,3 +122,21 @@ export const renderPlayerList = () => {
 
     DOM.playerList.appendChild(fragment);
 };
+
+export const renderSheet = (file = null) => {
+    const hasFile = !!file;
+
+    DOM.sheetUploadInput.classList.toggle('hidden', hasFile);
+    DOM.sheetDocument.classList.toggle('hidden', !hasFile);
+    DOM.sheetRemoveBtn.classList.toggle('hidden', !hasFile);
+
+    if (hasFile) {
+        DOM.sheetDocument.src = URL.createObjectURL(file);
+    } else {
+        if (DOM.sheetDocument.src && DOM.sheetDocument.src.startsWith('blob:')) {
+            URL.revokeObjectURL(DOM.sheetDocument.src);
+        }
+        DOM.sheetUploadInput.value = '';
+        DOM.sheetDocument.src = '';
+    }
+};
