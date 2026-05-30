@@ -127,16 +127,21 @@ export const renderSheet = (file = null) => {
     const hasFile = !!file;
 
     DOM.sheetUploadInput.classList.toggle('hidden', hasFile);
-    DOM.sheetDocument.classList.toggle('hidden', !hasFile);
+    DOM.sheetFile.classList.toggle('hidden', !hasFile);
     DOM.sheetRemoveBtn.classList.toggle('hidden', !hasFile);
 
+    if (DOM.sheetFile.src && DOM.sheetFile.src.startsWith('blob:')) {
+        URL.revokeObjectURL(DOM.sheetFile.src);
+        DOM.sheetFile.src = '';
+    }
+
     if (hasFile) {
-        DOM.sheetDocument.src = URL.createObjectURL(file);
-    } else {
-        if (DOM.sheetDocument.src && DOM.sheetDocument.src.startsWith('blob:')) {
-            URL.revokeObjectURL(DOM.sheetDocument.src);
+        try {
+            DOM.sheetFile.src = URL.createObjectURL(file);
+        } catch (e) {
+            throw new Error('Error rendering the document: ' + e);
         }
+    } else {
         DOM.sheetUploadInput.value = '';
-        DOM.sheetDocument.src = '';
     }
 };

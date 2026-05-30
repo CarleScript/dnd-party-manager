@@ -18,7 +18,9 @@ app.get('/api/config', (req, res) => {
         storageKey: config.storageKey,
         maxNameLength: config.maxNameLength,
         maxInitDigits: config.maxInitDigits,
-        maxHpDigits: config.maxHpDigits
+        maxHpDigits: config.maxHpDigits,
+        allowedFileMimeType: config.allowedFileMimeType,
+        maxFileSizeMb: config.maxFileSizeMb
     });
 });
 

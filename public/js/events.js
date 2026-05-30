@@ -67,12 +67,12 @@ export const handleJoin = () => {
 
     const username = DOM.usernameInput.value.trim();
     if (!username) {
-        alert('Enter a valid name, you fucking moron')
+        alert('Enter a valid name, you fucking moron!')
         DOM.usernameInput.focus();
         return;
     }
     if (username.length > state.config.maxNameLength) {
-        alert('Your name is too long, motherfucking narcissist');
+        alert('Your name is too long, motherfucking narcissist!');
         DOM.usernameInput.value = 'Douchebag';
         return;
     }
@@ -292,18 +292,61 @@ export const handleNpcNumberBlur = (e) => {
 };
 
 export const handleSheetUpload = async (e) => {
+    if (!state.config) {
+        console.warn('System initialization in progress. Please wait.');
+        alert(`The adventure isn't ready yet. Please try again in a moment.`);
+        return;
+    }
+
     const sheet = e.target?.files?.[0];
     if (!sheet) return;
-    await saveSheet('sheet', sheet);
-    renderSheet(sheet)
+
+    if (sheet.type !== state.config.allowedFileMimeType) {
+        DOM.sheetUploadInput.value = '';
+        console.warn('File type not allowed');
+        alert('How about picking the fucking right file type?');
+        return;
+    }
+
+    const maxFileSizeBytes = state.config.maxFileSizeMb * 1024 * 1024;
+    if (sheet.size > maxFileSizeBytes) {
+        DOM.sheetUploadInput.value = '';
+        console.warn('File size exceeds the permitted limit');
+        alert('This file is way too huge. If you want to waste memory, host your own damn server!');
+        return;
+    }
+
+    try {
+        await saveSheet(sheet);
+        renderSheet(sheet);
+    } catch (e) {
+        DOM.sheetUploadInput.value = '';
+        console.error('Error uploading the file: ' + e);
+        alert('What kind of shitty file did you just try to upload?!');
+    }
 };
 
 export const tryLoadSheet = async () => {
-    const sheet = await loadSheet('sheet');
-    if (sheet) renderSheet(sheet);
+    try {
+        const sheet = await loadSheet();
+        if (!sheet) return;
+        if (!(sheet instanceof Blob)) {
+            await removeSheet();
+            throw new Error('Data corruption detected: stored file is not a Blob instance.');
+        }
+        renderSheet(sheet);
+    } catch (e) {
+        console.error('Error loading the file: ' + e);
+        alert('This file is complete garbage. What the fuck did you just upload?');
+    }
 };
 
 export const handleSheetRemove = async (e) => {
-    await removeSheet('sheet');
-    renderSheet(null);
+    try {
+        await removeSheet();
+        renderSheet(null);
+    } catch (e) {
+        console.error('Error deleting the file: ' + e);
+        alert(`You are so useless that you can't even delete a file you uploaded...`);
+    }
 }

@@ -30,9 +30,12 @@ async function loadConfig() {
         console.error('Failed to retrieve server configuration: ', e);
         alert('You rolled a Natural 1 while reaching the server. Please refresh and try again.');
     } finally {
-        DOM.npcInitInput.max = Math.pow(10, state.config.maxInitDigits) - 1;
-        DOM.npcCurrentHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
-        DOM.npcMaxHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
+        if (state.config) {
+            DOM.npcInitInput.max = Math.pow(10, state.config.maxInitDigits) - 1;
+            DOM.npcCurrentHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
+            DOM.npcMaxHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
+            DOM.sheetUploadInput.setAttribute('accept', state.config.allowedFileMimeType);
+        }
     }
 }
 
