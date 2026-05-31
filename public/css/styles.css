@@ -443,7 +443,8 @@ input[type="number"] {
 }
 
 .upload-zone:hover,
-.upload-zone:focus-within {
+.upload-zone:focus-within,
+.upload-zone.drag-over {
     border-color: var(--text-main);
     color: var(--text-main);
     background-color: rgba(255, 255, 255, 0.05);

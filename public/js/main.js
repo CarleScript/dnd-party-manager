@@ -115,6 +115,16 @@ const init = async () => {
     DOM.sheetUploadInput.addEventListener('change', handleSheetUpload);
     DOM.sheetRemoveBtn.addEventListener('click', handleSheetRemove);
 
+    DOM.sheetUploadInput.addEventListener('dragenter', () => {
+        DOM.uploadContainer.classList.add('drag-over');
+    });
+    DOM.sheetUploadInput.addEventListener('dragleave', () => {
+        DOM.uploadContainer.classList.remove('drag-over');
+    });
+    DOM.sheetUploadInput.addEventListener('drop', () => {
+        DOM.uploadContainer.classList.remove('drag-over');
+    });
+
     const { id, view } = getSession();
     if (!id) toggleViews(view || 'login');
 };
