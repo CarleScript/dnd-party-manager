@@ -301,7 +301,7 @@ export const handleSheetUpload = async (e) => {
     const sheet = e.target?.files?.[0];
     if (!sheet) return;
 
-    if (sheet.type !== state.config.allowedFileMimeType) {
+    if (sheet.type !== 'application/pdf') {
         DOM.sheetUploadInput.value = '';
         console.warn('File type not allowed');
         alert('How about picking the fucking right file type?');
@@ -318,7 +318,7 @@ export const handleSheetUpload = async (e) => {
 
     try {
         await saveSheet(sheet);
-        renderSheet(sheet);
+        await renderSheet(sheet);
     } catch (e) {
         DOM.sheetUploadInput.value = '';
         console.error('Error uploading the file: ' + e);
@@ -334,7 +334,7 @@ export const tryLoadSheet = async () => {
             await removeSheet();
             throw new Error('Data corruption detected: stored file is not a Blob instance.');
         }
-        renderSheet(sheet);
+        await renderSheet(sheet);
     } catch (e) {
         console.error('Error loading the file: ' + e);
         alert('This file is complete garbage. What the fuck did you just upload?');
@@ -344,7 +344,7 @@ export const tryLoadSheet = async () => {
 export const handleSheetRemove = async (e) => {
     try {
         await removeSheet();
-        renderSheet(null);
+        await renderSheet(null);
     } catch (e) {
         console.error('Error deleting the file: ' + e);
         alert(`You are so useless that you can't even delete a file you uploaded...`);

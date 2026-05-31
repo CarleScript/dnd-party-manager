@@ -16,6 +16,6 @@ export const DOM = {
     npcCurrentHpInput: document.getElementById('npc-current-hp'),
     npcMaxHpInput: document.getElementById('npc-max-hp'),
     sheetUploadInput: document.getElementById('sheet-upload'),
-    sheetFile: document.getElementById('sheet-file'),
+    sheetViewer: document.getElementById('sheet-viewer'),
     sheetRemoveBtn: document.getElementById('btn-sheet-remove')
 };

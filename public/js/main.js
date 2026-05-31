@@ -34,7 +34,6 @@ async function loadConfig() {
             DOM.npcInitInput.max = Math.pow(10, state.config.maxInitDigits) - 1;
             DOM.npcCurrentHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
             DOM.npcMaxHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
-            DOM.sheetUploadInput.setAttribute('accept', state.config.allowedFileMimeType);
         }
     }
 }

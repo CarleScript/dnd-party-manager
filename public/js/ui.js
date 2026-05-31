@@ -1,6 +1,9 @@
 import { DOM } from './dom.js';
 import { state } from './state.js';
 
+import EmbedPDF from './lib/embedpdf/embedpdf.js';
+const { PDFDocument } = window.PDFLib;
+
 export const toggleViews = (view) => {
     const views = [[DOM.loginView, 'login'], [DOM.roomView, 'room'], [DOM.sheetView, 'sheet']];
     views.forEach(([element, name]) => { element.classList.toggle('hidden', name !== view) });
@@ -123,25 +126,60 @@ export const renderPlayerList = () => {
     DOM.playerList.appendChild(fragment);
 };
 
-export const renderSheet = (file = null) => {
+export const renderSheet = async (file = null) => {
     const hasFile = !!file;
 
     DOM.sheetUploadInput.classList.toggle('hidden', hasFile);
-    DOM.sheetFile.classList.toggle('hidden', !hasFile);
+    DOM.sheetViewer.classList.toggle('hidden', !hasFile);
     DOM.sheetRemoveBtn.classList.toggle('hidden', !hasFile);
 
-    if (DOM.sheetFile.src && DOM.sheetFile.src.startsWith('blob:')) {
-        URL.revokeObjectURL(DOM.sheetFile.src);
-        DOM.sheetFile.src = '';
+    DOM.sheetViewer.innerHTML = '';
+
+    const oldBlobUrl = DOM.sheetViewer.dataset.activeBlob;
+    if (oldBlobUrl) {
+        URL.revokeObjectURL(oldBlobUrl);
+        DOM.sheetViewer.removeAttribute('data-active-blob');
     }
 
-    if (hasFile) {
-        try {
-            DOM.sheetFile.src = URL.createObjectURL(file);
-        } catch (e) {
-            throw new Error('Error rendering the document: ' + e);
-        }
-    } else {
+    if (!hasFile) {
         DOM.sheetUploadInput.value = '';
+        return;
+    }
+
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+
+        const pdfDoc = await PDFDocument.load(arrayBuffer);
+        const form = pdfDoc.getForm();
+
+        form.flatten();
+
+        const flattenedPdfBytes = await pdfDoc.save();
+        const flattenedBlob = new Blob([flattenedPdfBytes], { type: 'application/pdf' });
+
+        const blobUrl = URL.createObjectURL(flattenedBlob);
+        DOM.sheetViewer.dataset.activeBlob = blobUrl;
+
+        EmbedPDF.init({
+            type: 'container',
+            target: DOM.sheetViewer,
+            src: blobUrl,
+            theme: { preference: 'system' },
+            disabledCategories: [
+                'document-open',
+                'document-close',
+                'document-protect'
+            ]
+        });
+    } catch (e) {
+        DOM.sheetViewer.innerHTML = '';
+
+        const failedBlob = DOM.sheetViewer.dataset.activeBlob;
+        if (failedBlob) {
+            URL.revokeObjectURL(failedBlob);
+            DOM.sheetViewer.removeAttribute('data-active-blob');
+        }
+
+        throw new Error('Error rendering the document: ' + e);
     }
 };

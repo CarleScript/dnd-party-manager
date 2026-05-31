@@ -19,7 +19,6 @@ app.get('/api/config', (req, res) => {
         maxNameLength: config.maxNameLength,
         maxInitDigits: config.maxInitDigits,
         maxHpDigits: config.maxHpDigits,
-        allowedFileMimeType: config.allowedFileMimeType,
         maxFileSizeMb: config.maxFileSizeMb
     });
 });
