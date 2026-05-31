@@ -1,6 +1,6 @@
 {
   "name": "dnd-party-manager",
-  "version": "0.4.6",
+  "version": "0.5.0",
   "description": "A real-time Dungeons & Dragons party manager for initiative tracking and character sheets, powered by WebSockets.",
   "main": "src/server.js",
   "type": "module",

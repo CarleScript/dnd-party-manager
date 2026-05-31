@@ -19,7 +19,7 @@ A modern, real-time web application built for Dungeon Masters and Players to sea
 
 ### 🏗️ Roadmap (Coming Soon)
 - [x] **NPC Integration:** Allow the DM to inject non-playable characters into the initiative order.
-- [ ] **PDF Character Sheets:** Integrated PDF reader so players can view their stats and initiative in the same tab.
+- [x] **PDF Character Sheets:** Integrated PDF reader so players can view their stats and initiative in the same tab.
 - [ ] **Toast Notifications:** Clean, modern UI alerts to replace native browser popups.
 - [ ] **Server-Side Persistence:** Database integration (SQLite3) to ensure party state and initiative data survive server restarts.
 - [ ] **Thematic UI/UX Polish:** Implementing a mobile-first, D&D-inspired visual design with responsive layouts and immersive dark-mode aesthetics.
