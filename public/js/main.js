@@ -1,8 +1,26 @@
-import { state, getSession } from './state.js';
 import { DOM } from './dom.js';
+import { state, getSession } from './state.js';
 import { toggleViews, renderPlayerList } from './ui.js';
-import { connectSocket, disconnectSocket, onConnect, onPartyUpdate } from "./socket.js";
-import { addPlayer, handleJoin, handleClick, handleMousedown, handleFocus, checkInput, preventInput, updateInput, openNpcModal, handleLeave, closeNpcModal, handleNpcNumberFocus, handleNpcNumberBlur } from './events.js';
+import { connectSocket, disconnectSocket, onConnect, onPartyUpdate } from './socket.js';
+import {
+    toggleSheet,
+    addPlayer,
+    handleJoin,
+    handleClick,
+    handleMousedown,
+    handleFocus,
+    checkInput,
+    preventInput,
+    updateInput,
+    openNpcModal,
+    handleLeave,
+    closeNpcModal,
+    handleNpcNumberFocus,
+    handleNpcNumberBlur,
+    handleSheetUpload,
+    tryLoadSheet,
+    handleSheetRemove
+} from './events.js';
 
 async function loadConfig() {
     try {
@@ -12,9 +30,11 @@ async function loadConfig() {
         console.error('Failed to retrieve server configuration: ', e);
         alert('You rolled a Natural 1 while reaching the server. Please refresh and try again.');
     } finally {
-        DOM.npcInitInput.max = Math.pow(10, state.config.maxInitDigits) - 1;
-        DOM.npcCurrentHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
-        DOM.npcMaxHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
+        if (state.config) {
+            DOM.npcInitInput.max = Math.pow(10, state.config.maxInitDigits) - 1;
+            DOM.npcCurrentHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
+            DOM.npcMaxHpInput.max = Math.pow(10, state.config.maxHpDigits) - 1;
+        }
     }
 }
 
@@ -24,11 +44,11 @@ onPartyUpdate((partyMembers) => {
 });
 
 onConnect(() => {
-    const { username, role, id } = getSession();
+    const { username, role, id, view } = getSession();
     if (id) {
         addPlayer(username, role, id, true);
     } else {
-        toggleViews('login');
+        toggleViews(view || 'login');
     }
 });
 
@@ -36,6 +56,7 @@ const EDITABLE_FIELDS = ['init', 'currentHp', 'maxHp'];
 
 const init = async () => {
     await loadConfig();
+    await tryLoadSheet();
 
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
@@ -45,6 +66,8 @@ const init = async () => {
             connectSocket();
         }
     });
+
+    DOM.toggleSheetBtn.addEventListener('click', toggleSheet);
 
     DOM.usernameInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') handleJoin();
@@ -89,8 +112,21 @@ const init = async () => {
         input.addEventListener('blur', handleNpcNumberBlur);
     });
 
-    const { id } = getSession();
-    if (!id) toggleViews('login');
+    DOM.sheetUploadInput.addEventListener('change', handleSheetUpload);
+    DOM.sheetRemoveBtn.addEventListener('click', handleSheetRemove);
+
+    DOM.sheetUploadInput.addEventListener('dragenter', () => {
+        DOM.uploadContainer.classList.add('drag-over');
+    });
+    DOM.sheetUploadInput.addEventListener('dragleave', () => {
+        DOM.uploadContainer.classList.remove('drag-over');
+    });
+    DOM.sheetUploadInput.addEventListener('drop', () => {
+        DOM.uploadContainer.classList.remove('drag-over');
+    });
+
+    const { id, view } = getSession();
+    if (!id) toggleViews(view || 'login');
 };
 
 init();

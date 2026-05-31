@@ -1,3 +1,5 @@
+import { DOM } from './dom.js';
+
 export const state = {
     players: [],
     config: null,
@@ -16,12 +18,14 @@ export const initSession = (userState) => {
 
 export const clearSession = () => {
     localStorage.removeItem(state.config.storageKey);
+    state.players = [];
     state.session = {
         id: null,
         username: null,
         role: null,
         view: null
     }
+    DOM.playerList.textContent = '';
 };
 
 export const getSession = () => {

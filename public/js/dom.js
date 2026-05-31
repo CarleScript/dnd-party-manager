@@ -1,6 +1,8 @@
 export const DOM = {
+    toggleSheetBtn: document.getElementById('btn-toggle-sheet'),
     loginView: document.getElementById('login-view'),
     roomView: document.getElementById('room-view'),
+    sheetView: document.getElementById('sheet-view'),
     usernameInput: document.getElementById('username'),
     roleInputs: document.getElementsByName('userRole'),
     joinBtn: document.getElementById('btn-join'),
@@ -12,5 +14,9 @@ export const DOM = {
     npcForm: document.getElementById('form-npc'),
     npcInitInput: document.getElementById('npc-init'),
     npcCurrentHpInput: document.getElementById('npc-current-hp'),
-    npcMaxHpInput: document.getElementById('npc-max-hp')
+    npcMaxHpInput: document.getElementById('npc-max-hp'),
+    uploadContainer: document.getElementById('upload-container'),
+    sheetUploadInput: document.getElementById('sheet-upload'),
+    sheetViewer: document.getElementById('sheet-viewer'),
+    sheetRemoveBtn: document.getElementById('btn-sheet-remove')
 };

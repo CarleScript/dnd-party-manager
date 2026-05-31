@@ -9,6 +9,7 @@ const _config = {
     maxNameLength: process.env.MAX_NAME_LENGTH || 30,
     maxInitDigits: process.env.MAX_INIT_DIGITS || 2,
     maxHpDigits: process.env.MAX_HP_DIGITS || 3,
+    maxFileSizeMb: process.env.MAX_FILE_SIZE_MB || 15,
     socketDisconnectTimeout: process.env.SOCKET_DISCONNECT_TIMEOUT_MS || 600000
 };
 

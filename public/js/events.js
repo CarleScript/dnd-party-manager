@@ -1,7 +1,20 @@
-import { state, initSession, clearSession } from './state.js';
 import { DOM } from './dom.js';
-import { toggleViews, renderPlayerList } from './ui.js';
-import { userJoin, userLeave, addNpc, removeNpc, updateStat } from "./socket.js";
+import { state, initSession, clearSession, getSession } from './state.js';
+import { toggleViews, renderPlayerList, renderSheet } from './ui.js';
+import { userJoin, userLeave, addNpc, removeNpc, updateStat } from './socket.js';
+import { saveSheet, loadSheet, removeSheet } from './api.js';
+
+export const toggleSheet = () => {
+    const { id, username, role, view } = getSession();
+    const altView = id ? 'room' : 'login'
+    const newView = !view || view === altView ? 'sheet' : altView;
+
+    toggleViews(newView);
+    initSession({ id, username, role, view: newView });
+    state.session.view = newView;
+
+    DOM.toggleSheetBtn.blur();
+};
 
 export const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) => {
     userJoin(name, role, savedUUID, (response) => {
@@ -10,7 +23,7 @@ export const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) =>
                 const userState = { id: response.userId, username: name, role: role, view: 'room' };
                 initSession(userState);
             }
-            toggleViews('room');
+            toggleViews(state.session.view || 'room');
             if (!isAutoRejoin) DOM.usernameInput.value = '';
             state.players = response.partyData;
             renderPlayerList();
@@ -56,12 +69,12 @@ export const handleJoin = () => {
 
     const username = DOM.usernameInput.value.trim();
     if (!username) {
-        alert('Enter a valid name, you fucking moron')
+        alert('Enter a valid name, you fucking moron!')
         DOM.usernameInput.focus();
         return;
     }
     if (username.length > state.config.maxNameLength) {
-        alert('Your name is too long, motherfucking narcissist');
+        alert('Your name is too long, motherfucking narcissist!');
         DOM.usernameInput.value = 'Douchebag';
         return;
     }
@@ -279,3 +292,63 @@ export const handleNpcNumberFocus = (e) => {
 export const handleNpcNumberBlur = (e) => {
     if (e.target.value === '') e.target.value = '0';
 };
+
+export const handleSheetUpload = async (e) => {
+    if (!state.config) {
+        console.warn('System initialization in progress. Please wait.');
+        alert(`The adventure isn't ready yet. Please try again in a moment.`);
+        return;
+    }
+
+    const sheet = e.target?.files?.[0];
+    if (!sheet) return;
+
+    if (sheet.type !== 'application/pdf') {
+        DOM.sheetUploadInput.value = '';
+        console.warn('File type not allowed');
+        alert('How about picking the fucking right file type?');
+        return;
+    }
+
+    const maxFileSizeBytes = state.config.maxFileSizeMb * 1024 * 1024;
+    if (sheet.size > maxFileSizeBytes) {
+        DOM.sheetUploadInput.value = '';
+        console.warn('File size exceeds the permitted limit');
+        alert('This file is way too huge. If you want to waste memory, host your own damn server!');
+        return;
+    }
+
+    try {
+        await saveSheet(sheet);
+        await renderSheet(sheet);
+    } catch (e) {
+        DOM.sheetUploadInput.value = '';
+        console.error('Error uploading the file: ' + e);
+        alert('What kind of shitty file did you just try to upload?!');
+    }
+};
+
+export const tryLoadSheet = async () => {
+    try {
+        const sheet = await loadSheet();
+        if (!sheet) return;
+        if (!(sheet instanceof Blob)) {
+            await removeSheet();
+            throw new Error('Data corruption detected: stored file is not a Blob instance.');
+        }
+        await renderSheet(sheet);
+    } catch (e) {
+        console.error('Error loading the file: ' + e);
+        alert('This file is complete garbage. What the fuck did you just upload?');
+    }
+};
+
+export const handleSheetRemove = async (e) => {
+    try {
+        await removeSheet();
+        await renderSheet(null);
+    } catch (e) {
+        console.error('Error deleting the file: ' + e);
+        alert(`You are so useless that you can't even delete a file you uploaded...`);
+    }
+}
