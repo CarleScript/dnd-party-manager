@@ -129,7 +129,7 @@ export const renderPlayerList = () => {
 export const renderSheet = async (file = null) => {
     const hasFile = !!file;
 
-    DOM.sheetUploadInput.classList.toggle('hidden', hasFile);
+    DOM.uploadContainer.classList.toggle('hidden', hasFile);
     DOM.sheetViewer.classList.toggle('hidden', !hasFile);
     DOM.sheetRemoveBtn.classList.toggle('hidden', !hasFile);
 

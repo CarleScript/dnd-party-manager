@@ -15,6 +15,7 @@ export const DOM = {
     npcInitInput: document.getElementById('npc-init'),
     npcCurrentHpInput: document.getElementById('npc-current-hp'),
     npcMaxHpInput: document.getElementById('npc-max-hp'),
+    uploadContainer: document.getElementById('upload-container'),
     sheetUploadInput: document.getElementById('sheet-upload'),
     sheetViewer: document.getElementById('sheet-viewer'),
     sheetRemoveBtn: document.getElementById('btn-sheet-remove')

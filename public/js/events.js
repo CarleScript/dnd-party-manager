@@ -12,6 +12,8 @@ export const toggleSheet = () => {
     toggleViews(newView);
     initSession({ id, username, role, view: newView });
     state.session.view = newView;
+
+    DOM.toggleSheetBtn.blur();
 };
 
 export const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) => {
