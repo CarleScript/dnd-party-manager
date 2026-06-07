@@ -1,6 +1,6 @@
 import { DOM } from './dom.js';
 import { state, initSession, clearSession, getSession } from './state.js';
-import { toggleViews, renderPlayerList, renderSheet } from './ui.js';
+import { toggleViews, toast, renderPlayerList, renderSheet } from './ui.js';
 import { userJoin, userLeave, addNpc, removeNpc, updateStat } from './socket.js';
 import { saveSheet, loadSheet, removeSheet } from './api.js';
 
@@ -38,22 +38,22 @@ export const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) =>
 
             switch (response.message) {
                 case 'session expired':
-                    alert('You failed your Saving Throw against Disconnection. Please sign in again.');
+                    toast('You failed your Saving Throw against Disconnection. Please sign in again.');
                     clearSession();
                     toggleViews('login');
                     break;
                 case 'username already taken':
-                    alert('This name has already been claimed. Be original and choose a new alias.');
+                    toast('This name has already been claimed. Be original and choose a new alias.');
                     break;
                 case 'master role already taken':
-                    alert(`The Master's throne is already occupied. You must join as a player.`);
+                    toast(`The Master's throne is already occupied. You must join as a player.`);
                     break;
                 case 'room full':
-                    alert('The party is already at its limit. Wait for an adventurer to leave before attempting to join.');
+                    toast('The party is already at its limit. Wait for an adventurer to leave before attempting to join.');
                     break;
                 default:
-                    alert('The party is currently inaccessible. Please try again.');
-                    location.reload();
+                    toast('The party is currently inaccessible. Please try again.');
+                    setTimeout(() => { location.reload(); }, 3000);
                     break;
             }
         }
@@ -63,26 +63,26 @@ export const addPlayer = (name, role, savedUUID = null, isAutoRejoin = false) =>
 export const handleJoin = () => {
     if (!state.config) {
         console.warn('System initialization in progress. Please wait.');
-        alert(`The adventure isn't ready yet. Please try again in a moment.`);
+        toast(`The adventure isn't ready yet. Please try again in a moment.`);
         return;
     }
 
     const username = DOM.usernameInput.value.trim();
     if (!username) {
-        alert('Enter a valid name, you fucking moron!')
+        toast('Enter a valid name, you fucking moron!')
         DOM.usernameInput.focus();
         return;
     }
     if (username.length > state.config.maxNameLength) {
-        alert('Your name is too long, motherfucking narcissist!');
+        toast('Your name is too long, motherfucking narcissist!');
         DOM.usernameInput.value = 'Douchebag';
         return;
     }
 
     const role = Array.from(DOM.roleInputs).find(input => input.checked)?.value;
     if (!role || !['player', 'master'].includes(role)) {
-        alert('DO NOT MODIFY MY HTML, YOU FILTHY SCUM!');
-        location.reload();
+        toast('DO NOT MODIFY MY HTML, YOU FILTHY SCUM!');
+        setTimeout(() => { location.reload(); }, 3000);
         return;
     }
 
@@ -102,8 +102,8 @@ export const handleClick = (e) => {
                     return;
                 }
                 console.warn('NPC remove rejected by server: ', response.message);
-                alert('Fight the monster without cheats, you cowardly piece of shit!');
-                location.reload();
+                toast('Fight the monster without cheats, you cowardly piece of shit!');
+                setTimeout(() => { location.reload(); }, 3000);
             });
         }
     }
@@ -205,8 +205,8 @@ export const updateInput = (e, inputName) => {
             return;
         }
         console.warn('Stat modification rejected by server: ', response.message);
-        alert("Don't tempt my patience, you miserable cheat. Stick to the rules or fuck off.");
-        location.reload();
+        toast("Don't tempt my patience, you miserable cheat. Stick to the rules or fuck off.");
+        setTimeout(() => { location.reload(); }, 3000);
     });
 };
 
@@ -229,7 +229,7 @@ export const closeNpcModal = () => {
 
     if (!state.config) {
         console.warn('System initialization in progress. Please wait.');
-        alert(`The adventure isn't ready yet. Please try again in a moment.`);
+        toast(`The adventure isn't ready yet. Please try again in a moment.`);
         return;
     }
 
@@ -247,11 +247,11 @@ export const closeNpcModal = () => {
     const maxHp = parseInt(rawMaxHp, 10);
 
     if (!name) {
-        alert(`What kind of Master can't think of a motherfucking name?!`);
+        toast(`What kind of Master can't think of a motherfucking name?!`);
         return;
     }
     if (name.length > state.config.maxNameLength) {
-        alert('Nobody is impressed by your novel-length title. Keep it short!');
+        toast('Nobody is impressed by your novel-length title. Keep it short!');
         return;
     }
 
@@ -261,7 +261,7 @@ export const closeNpcModal = () => {
 
     if (isInitNotOk || isCurrentHpNotOk || isMaxHpNotOk) {
         const stat = isInitNotOk ? 'initiative' : isCurrentHpNotOk ? 'current hp' : 'max hp';
-        alert(`How the fuck did you manage to send a wrong ${stat} value?`);
+        toast(`How the fuck did you manage to send a wrong ${stat} value?`);
         return;
     }
 
@@ -272,14 +272,14 @@ export const closeNpcModal = () => {
         console.warn('NPC add rejected by server: ', response.message);
         switch (response.message) {
             case 'forbidden':
-                alert(`You're not the Master. Stay back, you filthy rogue!`);
+                toast(`You're not the Master. Stay back, you filthy rogue!`);
                 break;
             case 'name already taken':
-                alert('This name has already taken. Add a number at the end or something...');
+                toast('This name has already taken. Add a number at the end or something...');
                 break;
             default:
-                alert('The NPC failed to materialize. Try again, loser.');
-                location.reload();
+                toast('The NPC failed to materialize. Try again, loser.');
+                setTimeout(() => { location.reload(); }, 3000);
                 break;
         }
     });
@@ -296,7 +296,7 @@ export const handleNpcNumberBlur = (e) => {
 export const handleSheetUpload = async (e) => {
     if (!state.config) {
         console.warn('System initialization in progress. Please wait.');
-        alert(`The adventure isn't ready yet. Please try again in a moment.`);
+        toast(`The adventure isn't ready yet. Please try again in a moment.`);
         return;
     }
 
@@ -306,7 +306,7 @@ export const handleSheetUpload = async (e) => {
     if (sheet.type !== 'application/pdf') {
         DOM.sheetUploadInput.value = '';
         console.warn('File type not allowed');
-        alert('How about picking the fucking right file type?');
+        toast('How about picking the fucking right file type?');
         return;
     }
 
@@ -314,7 +314,7 @@ export const handleSheetUpload = async (e) => {
     if (sheet.size > maxFileSizeBytes) {
         DOM.sheetUploadInput.value = '';
         console.warn('File size exceeds the permitted limit');
-        alert('This file is way too huge. If you want to waste memory, host your own damn server!');
+        toast('This file is way too huge. If you want to waste memory, host your own damn server!');
         return;
     }
 
@@ -324,7 +324,7 @@ export const handleSheetUpload = async (e) => {
     } catch (e) {
         DOM.sheetUploadInput.value = '';
         console.error('Error uploading the file: ' + e);
-        alert('What kind of shitty file did you just try to upload?!');
+        toast('What kind of shitty file did you just try to upload?!');
     }
 };
 
@@ -339,7 +339,7 @@ export const tryLoadSheet = async () => {
         await renderSheet(sheet);
     } catch (e) {
         console.error('Error loading the file: ' + e);
-        alert('This file is complete garbage. What the fuck did you just upload?');
+        toast('This file is complete garbage. What the fuck did you just upload?');
     }
 };
 
@@ -349,6 +349,6 @@ export const handleSheetRemove = async (e) => {
         await renderSheet(null);
     } catch (e) {
         console.error('Error deleting the file: ' + e);
-        alert(`You are so useless that you can't even delete a file you uploaded...`);
+        toast(`You are so useless that you can't even delete a file you uploaded...`);
     }
 }

@@ -1,7 +1,8 @@
 import { DOM } from './dom.js';
 import { state } from './state.js';
-
+import StartToastifyInstance from './lib/toastify/toastify-es.js';
 import EmbedPDF from './lib/embedpdf/embedpdf.js';
+
 const { PDFDocument } = window.PDFLib;
 
 export const toggleViews = (view) => {
@@ -14,6 +15,19 @@ export const toggleViews = (view) => {
     }
 
     if (view === 'login') DOM.usernameInput.focus();
+};
+
+export const toast = (message) => {
+    if (document.querySelector('.notification-toast')) return;
+
+    StartToastifyInstance({
+        text: message,
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+        escapeMarkup: false,
+        className: 'notification-toast'
+    }).showToast();
 };
 
 export const el = (tag, options = {}, children = []) => {
@@ -40,7 +54,7 @@ export const el = (tag, options = {}, children = []) => {
 export const renderPlayerList = () => {
     if (!state.config) {
         console.warn('System initialization in progress. Please wait.');
-        alert(`The adventure isn't ready yet. Please try again in a moment.`);
+        toast(`The adventure isn't ready yet. Please try again in a moment.`);
         return;
     }
 
