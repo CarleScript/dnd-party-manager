@@ -1,6 +1,6 @@
 import { DOM } from './dom.js';
 import { state, getSession } from './state.js';
-import { toggleViews, renderPlayerList } from './ui.js';
+import { toggleViews, toast, renderPlayerList } from './ui.js';
 import { connectSocket, disconnectSocket, onConnect, onPartyUpdate } from './socket.js';
 import {
     toggleSheet,
@@ -28,7 +28,7 @@ async function loadConfig() {
         state.config = await res.json();
     } catch (e) {
         console.error('Failed to retrieve server configuration: ', e);
-        alert('You rolled a Natural 1 while reaching the server. Please refresh and try again.');
+        toast('You rolled a Natural 1 while reaching the server. Please refresh and try again.');
     } finally {
         if (state.config) {
             DOM.npcInitInput.max = Math.pow(10, state.config.maxInitDigits) - 1;

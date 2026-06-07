@@ -523,3 +523,24 @@ input[type="number"] {
     height: calc(100dvh - 12.5rem);
     min-height: 400px;
 }
+
+.notification-toast {
+    background: var(--accent-red);
+    color: var(--text-main);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 0.95rem;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    padding: 0.9rem 1.2rem;
+    border: 2px solid var(--bg-card);
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+}
+
+.notification-toast:hover {
+    background: var(--accent-hover);
+    color: #fff;
+    border: 2px solid var(--accent-red);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
