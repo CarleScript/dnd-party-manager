@@ -10,16 +10,18 @@ A modern, real-time web application built for Dungeon Masters and Players to sea
 
 ## ✨ Features
 
+### 🎲 Gameplay Features
+* **Role Management:** Differentiates between `Master (DM)` and `Player` roles.
+* **NPC Integration:** Allows the DM to inject `non-playable (NPC)` characters into the initiative order.
+* **Stats Tracking:** Monitors `Initiative` and `HP` in real time directly from the initiative board, with DM override capabilities.
+* **PDF Character Sheets:** Integrates an in-app PDF reader so players can view their stats and initiative in the same tab.
+
 ### 🛠️ Current Capabilities
-* **Real-Time Synchronization:** Powered by Socket.io for instant updates across all connected devices.
-* **Smart Reconnection:** Handles mobile browser throttling and screen locks gracefully with native Page Visibility API integration.
-* **Role Management:** Differentiates between 'Master' (DM) and 'Player' roles.
+* **Real-Time Synchronization:** Powered by `Socket.io` for instant updates across all connected devices.
 * **Session Persistence:** Remembers user sessions via `localStorage` to survive accidental refreshes or disconnects.
-* **Stats Tracking:** Real-time Initiative and HP monitoring directly from the initiative board, with DM override capabilities.
+* **Smart Reconnection:** Handles mobile browser throttling and screen locks gracefully with native `Page Visibility API` integration.
 
 ### 🏗️ Roadmap (Coming Soon)
-- [x] **NPC Integration:** Allow the DM to inject non-playable characters into the initiative order.
-- [x] **PDF Character Sheets:** Integrated PDF reader so players can view their stats and initiative in the same tab.
 - [x] **Toast Notifications:** Clean, modern UI alerts to replace native browser popups.
 - [ ] **Server-Side Persistence:** Database integration (SQLite3) to ensure party state and initiative data survive server restarts.
 - [ ] **Thematic UI/UX Polish:** Implementing a mobile-first, D&D-inspired visual design with responsive layouts and immersive dark-mode aesthetics.
