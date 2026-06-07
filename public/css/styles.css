@@ -162,12 +162,15 @@ input[type="number"] {
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.btn-primary:hover,
-.btn-primary:focus {
-    background-color: var(--accent-hover);
+@media (hover: hover) {
+    .btn-primary:hover {
+        background-color: var(--accent-hover);
+    }
 }
 
+.btn-primary:focus-visible,
 .btn-primary:active {
+    background-color: var(--accent-hover);
     transform: translateY(2px);
 }
 
@@ -185,8 +188,16 @@ input[type="number"] {
     transition: all 0.2s ease;
 }
 
-.btn-secondary:hover,
-.btn-secondary:focus {
+@media (hover: hover) {
+    .btn-secondary:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--text-main);
+        border-color: var(--text-main);
+    }
+}
+
+.btn-secondary:focus-visible,
+.btn-secondary:active {
     background-color: rgba(255, 255, 255, 0.05);
     color: var(--text-main);
     border-color: var(--text-main);
@@ -442,12 +453,25 @@ input[type="number"] {
     overflow: hidden;
 }
 
-.upload-zone:hover,
-.upload-zone:focus-within,
+@media (hover: hover) {
+    .upload-zone:hover {
+        border-color: var(--text-main);
+        color: var(--text-main);
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+}
+
+.upload-zone:has(input:focus-visible),
 .upload-zone.drag-over {
     border-color: var(--text-main);
     color: var(--text-main);
     background-color: rgba(255, 255, 255, 0.05);
+}
+
+.upload-zone:has(input:active) {
+    border-color: var(--text-main);
+    color: var(--text-main);
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
 .upload-zone input[type="file"] {
