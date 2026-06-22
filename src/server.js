@@ -24,6 +24,21 @@ async function startServer() {
             console.log(`server is running at http://localhost:${PORT}`);
         });
 
+        const shutdown = (signal) => {
+            console.log(`signal ${signal} received, shutting down...`);
+            io.close(() => {
+                console.log('Server shut down gracefully');
+                process.exit(0);
+            });
+            setTimeout(() => {
+                console.error('Shutdown timed out, some connections did not close in time, forcing exit...');
+                process.exit(1);
+            }, 5000).unref();
+        };
+
+        process.on('SIGTERM', () => shutdown('SIGTERM'));
+        process.on('SIGINT', () => shutdown('SIGINT'));
+
     } catch (error) {
         console.error('Error:', error);
         process.exit(1);

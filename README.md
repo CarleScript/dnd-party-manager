@@ -5,6 +5,7 @@
 [![Node.js](https://img.shields.io/badge/Node.js->=18.0.0-339933?logo=node.js)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-11.0.5-f69220?logo=pnpm)](https://pnpm.io/)
 [![Socket.io](https://img.shields.io/badge/Socket.io-4.8.3-010101?logo=socket.io)](https://socket.io/)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 
 A modern, real-time web application built for Dungeon Masters and Players to seamlessly manage Dungeons & Dragons sessions. It provides instant synchronization for initiative orders, player status, and (coming soon) integrated character sheets.
 
@@ -33,6 +34,7 @@ A modern, real-time web application built for Dungeon Masters and Players to sea
 * **Real-Time Engine:** Socket.io
 * **Frontend:** Vanilla JS (ES Modules), HTML5, CSS3
 * **Package Manager:** pnpm
+* **Containerization:** Docker
 
 ## 🚀 Getting Started
 
@@ -87,6 +89,33 @@ pnpm start
 ```
 
 Once running, navigate to `http://localhost:<PORT>` in your browser.
+
+### 🐳 Running with Docker
+
+You don't need Node.js or pnpm installed locally — Docker builds and runs everything in an isolated container. You only need a `.env` file (see above).
+
+1. Build the image:
+```bash
+docker build -t dnd-party-manager .
+```
+
+2. Run the container:
+```bash
+docker run -d \
+  --name dnd-party-manager \
+  -p 3000:3000 \
+  --env-file .env \
+  --restart=unless-stopped \
+  dnd-party-manager
+```
+
+A few things the image does by design:
+* **Non-root:** runs as the unprivileged `node` user.
+* **Production mode:** `NODE_ENV=production` is baked in; config is injected at runtime via `--env-file`, so the same image works in any environment.
+* **Graceful shutdown:** handles `SIGTERM`/`SIGINT`, so `docker stop` closes connections cleanly instead of being killed.
+* **Resilient:** `--restart=unless-stopped` brings it back after a crash or reboot (but stays down if you stop it yourself with `docker stop`).
+
+> If you change `PORT` in your `.env`, update the right-hand side of `-p 3000:3000` to match.
 
 ## 📝 License
 

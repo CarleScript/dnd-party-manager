@@ -1,0 +1,39 @@
+# Docker
+Dockerfile
+.dockerignore
+
+# Git
+.git/
+.gitignore
+
+# Dependencies
+node_modules/
+
+# SQLite Databases
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# data
+data/
+
+# Logs
+*.log
+pnpm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# ENV
+.env
+.env.example
+
+# Documentation
+LICENSE
+README.md
