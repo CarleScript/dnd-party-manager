@@ -1,5 +1,6 @@
 # Docker
 Dockerfile
+Dockerfile.dev
 .dockerignore
 
 # Git
@@ -8,6 +9,7 @@ Dockerfile
 
 # Dependencies
 node_modules/
+.pnpm-store/
 
 # SQLite Databases
 *.db
