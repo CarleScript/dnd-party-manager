@@ -94,6 +94,8 @@ Once running, navigate to `http://localhost:<PORT>` in your browser.
 
 You don't need Node.js or pnpm installed locally — Docker builds and runs everything in an isolated container. You only need a `.env` file (see above).
 
+#### Production
+
 1. Build the image:
 ```bash
 docker build -t dnd-party-manager .
@@ -116,6 +118,31 @@ A few things the image does by design:
 * **Resilient:** `--restart=unless-stopped` brings it back after a crash or reboot (but stays down if you stop it yourself with `docker stop`).
 
 > If you change `PORT` in your `.env`, update the right-hand side of `-p 3000:3000` to match.
+
+#### Development
+
+1. Build the image:
+```bash
+docker build -t dnd-party-manager-dev -f Dockerfile.dev .
+```
+
+2. Install the dependencies (first time / package.json changed):
+```bash
+docker run -it --rm -v "$PWD":/app dnd-party-manager-dev pnpm install
+```
+
+3. Run the container:
+```bash
+docker run -it --rm -v "$PWD":/app -p 127.0.0.1:3000:3000 dnd-party-manager-dev
+```
+
+A few things this image does by design:
+* **Code on the host:** there's no `COPY` — the project is bind-mounted into the container at runtime, so file changes on the host are picked up instantly inside the container.
+* **Disposable containers:** every command uses `--rm`, so each container is removed on exit — safe because all state (source and dependencies) lives on the host, not inside the container.
+* **Deps installed at runtime:** dependencies are installed into the bind-mounted project via a one-off `pnpm install` instead of being baked into the image, so no rebuild is needed when the lockfile changes.
+* **Config from the mount:** the `.env` file is part of the bind-mounted project, so the server reads it directly — no `--env-file` needed, unlike production.
+* **Live reload:** `node --watch` restarts the server automatically on every saved change.
+* **Loopback-only:** the run command binds to `127.0.0.1`, so the dev server is reachable only from the local machine, not the network.
 
 ## 📝 License
 
